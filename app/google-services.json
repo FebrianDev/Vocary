@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "933223375933",
+    "project_id": "vocary-9df98",
+    "storage_bucket": "vocary-9df98.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:933223375933:android:76366410c504e322ca7654",
+        "android_client_info": {
+          "package_name": "com.febriandev.vocary"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "933223375933-7l4trac2m8qs7fng0vs0mv6peuvcmvm3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.febriandev.vocary",
+            "certificate_hash": "51bc0562908763c98ed2928b4ea0c90c4d60ddd2"
+          }
+        },
+        {
+          "client_id": "933223375933-p2p1pnr273066nj3pn50cm5j22nrqvu5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwiTa905v-jy66kTGOAno2PqJG6ZWnqEs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "933223375933-p2p1pnr273066nj3pn50cm5j22nrqvu5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
