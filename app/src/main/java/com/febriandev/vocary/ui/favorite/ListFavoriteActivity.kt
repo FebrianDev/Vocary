@@ -29,6 +29,7 @@ import com.febriandev.vocary.utils.ScreenshotController
 import com.febriandev.vocary.ui.components.SortOrder
 import com.febriandev.vocary.ui.components.SortType
 import com.febriandev.vocary.ui.components.TitleTopBar
+import com.febriandev.vocary.ui.components.VocabularyNote
 import com.febriandev.vocary.ui.components.VocabularyShare
 import com.febriandev.vocary.ui.items.VocabularyVerticalPager
 import com.febriandev.vocary.ui.theme.VocaryTheme
@@ -75,13 +76,17 @@ class ListFavoriteActivity : ComponentActivity() {
 
                     val bottomSheetState =
                         rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
                     var showShare by remember { mutableStateOf(false) }
+                    var showNote by remember { mutableStateOf(false) }
 
                     val pagerState = rememberPagerState(initialPage = position)
 
                     val captureController = remember { ScreenshotController() }
                     var capturedImage by remember { mutableStateOf<ImageBitmap?>(null) }
                     var shouldCaptureScreenshot by remember { mutableStateOf(false) }
+
+
 
                     //  val messageFlow = favoriteVocabViewModel.favoriteMessage
 
@@ -123,13 +128,16 @@ class ListFavoriteActivity : ComponentActivity() {
                         ) {
 
                             if (!shouldCaptureScreenshot) {
-                                TitleTopBar("Favorite"){
+                                TitleTopBar("Favorite") {
                                     finish()
                                 }
                             }
 
                             VocabularyVerticalPager(
                                 vocabs,
+                                shouldCaptureScreenshot, onNoteCLick = {
+                                    showNote = true
+                                },
                                 onShareClick = {
                                     shouldCaptureScreenshot = true
                                 },
@@ -143,11 +151,13 @@ class ListFavoriteActivity : ComponentActivity() {
                         }
                     }
 
-                    VocabularyShare(showShare, capturedImage, bottomSheetState) {
-                        showShare = false
-                        shouldCaptureScreenshot = false
-                        capturedImage = null
-                    }
+                    //VocabularyNote(showNote) { showNote = false }
+
+//                    VocabularyShare(showShare, capturedImage, applicationContext) {
+//                        showShare = false
+//                        shouldCaptureScreenshot = false
+//                        capturedImage = null
+//                    }
                 }
             }
         }

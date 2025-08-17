@@ -24,6 +24,7 @@ fun VocabularyInfo(
     bottomSheetState: SheetState,
     onDismiss: () -> Unit
 ) {
+
     if (showSheet && selectedVocab != null) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
@@ -58,26 +59,29 @@ fun VocabularyInfo(
                         "Definition:",
                         style = MaterialTheme.typography.labelLarge
                     )
-                    Text(
-                        selectedVocab.definition,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
 
-                    if (selectedVocab.examples.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Examples:", style = MaterialTheme.typography.labelLarge)
-                        selectedVocab.examples.forEach {
-                            Text("• $it", style = MaterialTheme.typography.bodySmall)
-                        }
-                    }
-
-                    if (selectedVocab.synonyms.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Synonyms:", style = MaterialTheme.typography.labelLarge)
+                    selectedVocab.definitions.forEach {
                         Text(
-                            selectedVocab.synonyms.joinToString(", "),
-                            style = MaterialTheme.typography.bodySmall
+                            it.definition,
+                            style = MaterialTheme.typography.bodyMedium
                         )
+
+                        if (it.examples.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Examples:", style = MaterialTheme.typography.labelLarge)
+                            it.examples.forEach {
+                                Text("• $it", style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+
+                        if (it.synonyms.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Synonyms:", style = MaterialTheme.typography.labelLarge)
+                            Text(
+                                it.synonyms.joinToString(", "),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))

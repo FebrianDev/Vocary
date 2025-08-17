@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.febriandev.vocary.ui.components.SortOrder
 import com.febriandev.vocary.ui.components.SortType
 import com.febriandev.vocary.ui.components.TitleTopBar
+import com.febriandev.vocary.ui.components.VocabularyNote
 import com.febriandev.vocary.ui.components.VocabularyShare
 import com.febriandev.vocary.ui.items.VocabularyVerticalPager
 import com.febriandev.vocary.ui.theme.VocaryTheme
@@ -75,7 +76,9 @@ class ListHistoryActivity : ComponentActivity() {
 
                     val bottomSheetState =
                         rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
                     var showShare by remember { mutableStateOf(false) }
+                    var showNote by remember { mutableStateOf(false) }
 
                     val pagerState = rememberPagerState(initialPage = position)
 
@@ -124,6 +127,9 @@ class ListHistoryActivity : ComponentActivity() {
 
                             VocabularyVerticalPager(
                                 vocabs,
+                                shouldCaptureScreenshot, onNoteCLick = {
+                                    showNote = true
+                                },
                                 onShareClick = {
                                     shouldCaptureScreenshot = true
                                 },
@@ -134,11 +140,13 @@ class ListHistoryActivity : ComponentActivity() {
                             )
                         }
 
-                        VocabularyShare(showShare, capturedImage, bottomSheetState) {
-                            showShare = false
-                            shouldCaptureScreenshot = false
-                            capturedImage = null
-                        }
+                        //VocabularyNote(showNote) { showNote = false }
+
+//                        VocabularyShare(showShare, capturedImage, applicationContext) {
+//                            showShare = false
+//                            shouldCaptureScreenshot = false
+//                            capturedImage = null
+//                        }
                     }
                 }
             }

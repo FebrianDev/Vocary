@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +39,7 @@ fun VocabularyCard(
     example: String,
     isFavorite: Boolean,
     srsStatus: SrsStatus,
+    shouldCaptureScreenshot: Boolean,
     onPlayPronunciationClick: () -> Unit,
     onInfoClick: () -> Unit,
     onTranslate: () -> Unit,
@@ -61,7 +61,8 @@ fun VocabularyCard(
                 .fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             color = background,
-            tonalElevation = 4.dp
+            tonalElevation = 4.dp,
+            // border = if(shouldCaptureScreenshot) BorderStroke(1.dp, Color.White) else null
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -127,70 +128,72 @@ fun VocabularyCard(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onInfoClick) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "Info",
-                            tint = primary,
-                            modifier = Modifier.size(32.dp)
-                        )
+                if (!shouldCaptureScreenshot) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = onInfoClick) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = "Info",
+                                tint = primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+
+                        IconButton(onClick = onNotes) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Notes",
+                                tint = primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+
+//                    IconButton(onClick = onTranslate) {
+//                        Icon(
+//                            Icons.Default.Translate,
+//                            contentDescription = "Translate",
+//                            tint = primary,
+//                            modifier = Modifier.size(32.dp)
+//                        )
+//                    }
+
+
+                        //  Spacer(modifier = Modifier.width(24.dp))
+
+                        IconButton(onClick = onShareClick) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share",
+                                tint = primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+
+
+                        // Spacer(modifier = Modifier.width(32.dp))
+
+                        IconButton(onClick = onFavoriteClick) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Favorite",
+                                tint = primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
                     }
 
-                    IconButton(onClick = onTranslate) {
-                        Icon(
-                            Icons.Default.Translate,
-                            contentDescription = "Translate",
-                            tint = primary,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-
-
-                    //  Spacer(modifier = Modifier.width(24.dp))
-
-                    IconButton(onClick = onShareClick) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "Share",
-                            tint = primary,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-
-                    IconButton(onClick = onNotes) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Notes",
-                            tint = primary,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-
-
-                    // Spacer(modifier = Modifier.width(32.dp))
-
-                    IconButton(onClick = onFavoriteClick) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Favorite",
-                            tint = primary,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
                 }
-
-
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        VocabularyAnswerSection(srsStatus, onAnswerClick)
+        if (!shouldCaptureScreenshot)
+            VocabularyAnswerSection(srsStatus, onAnswerClick)
     }
 }

@@ -1,5 +1,6 @@
 package com.febriandev.vocary
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,17 +45,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
+import com.febriandev.vocary.domain.Vocabulary
+import com.febriandev.vocary.ui.components.VocabularyNote
+import com.febriandev.vocary.ui.components.VocabularyShare
+import com.febriandev.vocary.ui.components.VocabularyTopBar
+import com.febriandev.vocary.ui.streaks.StreakScreen
+import com.febriandev.vocary.ui.content.ContentScreen
+import com.febriandev.vocary.ui.items.VocabularyVerticalPager
+import com.febriandev.vocary.ui.minigame.MiniGameActivity
+import com.febriandev.vocary.ui.profile.ProfileScreen
+import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.VocabularyViewModel
 import com.febriandev.vocary.utils.Constant.LEVEL
 import com.febriandev.vocary.utils.Constant.TOPIC
 import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.utils.ScreenshotBox
 import com.febriandev.vocary.utils.ScreenshotController
-import com.febriandev.vocary.ui.components.VocabularyShare
-import com.febriandev.vocary.ui.components.VocabularyTopBar
-import com.febriandev.vocary.ui.content.ContentScreen
-import com.febriandev.vocary.ui.items.VocabularyVerticalPager
-import com.febriandev.vocary.ui.theme.VocaryTheme
-import com.febriandev.vocary.ui.vm.VocabularyViewModel
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -78,7 +85,7 @@ class MainActivity : BaseActivity() {
                 }
 
                 var progressNow by remember { mutableIntStateOf(0) }
-                val progressMax  = 10
+                val progressMax = 10
 
                 val coroutineScope = rememberCoroutineScope()
 
@@ -88,8 +95,11 @@ class MainActivity : BaseActivity() {
                 var showLoadingDialog by remember { mutableStateOf(false) }
 
                 var showContent by remember { mutableStateOf(false) }
+                var showNote by remember { mutableStateOf(false) }
                 var showShare by remember { mutableStateOf(false) }
                 var showProfile by remember { mutableStateOf(false) }
+
+                var selectedVocab by remember { mutableStateOf<Vocabulary>(Vocabulary()) }
 
                 val captureController = remember { ScreenshotController() }
 
@@ -125,14 +135,15 @@ class MainActivity : BaseActivity() {
                     ScreenshotBox(
                         modifier = Modifier
                             .padding(innerPadding)
-                            .fillMaxSize()
-                            .padding(24.dp), controller = captureController, onBitmapCaptured = {
+                            .fillMaxSize(), controller = captureController, onBitmapCaptured = {
                             capturedImage = it
                         }) {
 
                         Column(
                             modifier = Modifier
-                                .fillMaxSize(),
+                                .fillMaxWidth()
+                                .fillMaxHeight(1f)
+                                .padding(24.dp),
                             verticalArrangement = Arrangement.SpaceBetween,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -147,9 +158,16 @@ class MainActivity : BaseActivity() {
 
                             VocabularyVerticalPager(
                                 vocabs,
+                                shouldCaptureScreenshot,
+                                onNoteCLick = {
+                                    selectedVocab = it
+                                    showNote = true
+                                },
                                 onShareClick = {
+                                    selectedVocab = it
                                     shouldCaptureScreenshot = true
                                 },
+
                                 onProgress = {
                                     progressNow += 1
                                 },
@@ -173,6 +191,7 @@ class MainActivity : BaseActivity() {
                                         shape = RoundedCornerShape(50),
                                         shadowElevation = 4.dp,
                                         color = MaterialTheme.colorScheme.surface,
+                                        tonalElevation = 4.dp,
                                         modifier = Modifier.clickable {
                                             showContent = true
                                         }
@@ -191,8 +210,13 @@ class MainActivity : BaseActivity() {
                                         shape = RoundedCornerShape(50),
                                         shadowElevation = 4.dp,
                                         color = MaterialTheme.colorScheme.surface,
+                                        tonalElevation = 4.dp,
                                         modifier = Modifier.clickable {
-
+                                            val intent = Intent(
+                                                applicationContext,
+                                                MiniGameActivity::class.java
+                                            )
+                                            startActivity(intent)
                                         }
                                     ) {
                                         Row(
@@ -252,6 +276,7 @@ class MainActivity : BaseActivity() {
                                         shape = RoundedCornerShape(50),
                                         shadowElevation = 4.dp,
                                         color = MaterialTheme.colorScheme.surface,
+                                        tonalElevation = 4.dp,
                                         modifier = Modifier.clickable {
                                             showProfile = true
                                         }
@@ -271,12 +296,23 @@ class MainActivity : BaseActivity() {
                             }
                         }
 
+                        VocabularyNote(selectedVocab, showNote, vocabViewModel) { showNote = false }
 
-                        VocabularyShare(showShare, capturedImage, bottomSheetState) {
+
+                        VocabularyShare(
+                            selectedVocab,
+                            capturedImage,
+                            applicationContext,
+                            this@MainActivity,
+                            showShare,
+                            vocabViewModel
+                        ) {
                             showShare = false
                             shouldCaptureScreenshot = false
                             capturedImage = null
                         }
+
+                        StreakScreen()
 
 //                        AlertDialog(
 //                            containerColor = MaterialTheme.colorScheme.background,
@@ -341,23 +377,21 @@ class MainActivity : BaseActivity() {
                         }
                     }
 //
-//                    ProfileScreen(
-//                        showProfile,
-//                        isGreeting,
-//                        isMotivation,
-//                        coroutineScope,
-//                        applicationContext,
-//                        {
-//                            //   isGreeting = it
-//                        },
-//                        {
-//                            // isMotivation = it
-//                        },
-//                        {
-//                            // vocabViewModel.deleteAllData()
-//                        }) {
-//                        showProfile = false
-//                    }
+                    ProfileScreen(
+                        showProfile,
+                        coroutineScope,
+                        applicationContext,
+                        {
+                            //   isGreeting = it
+                        },
+                        {
+                            // isMotivation = it
+                        },
+                        {
+                            // vocabViewModel.deleteAllData()
+                        }) {
+                        showProfile = false
+                    }
 
 
                 }

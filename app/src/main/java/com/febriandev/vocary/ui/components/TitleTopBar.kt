@@ -12,15 +12,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TitleTopBar(title: String, onBack: () -> Unit) {
+fun TitleTopBar(
+    title: String,
+    icon: ImageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+    onBack: () -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+            imageVector = icon,
             contentDescription = "Back",
             modifier = Modifier.clickable {
                 onBack.invoke()

@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class VocabularyRepository @Inject constructor(private val vocabularyDao: VocabularyDao) {
-    suspend fun getAllVocabulary(): List<Vocabulary> {
-        return vocabularyDao.getAllVocabulary().map { it.toVocabulary() }
+    suspend fun getAllVocabulary(currentTime:Long): List<Vocabulary> {
+        return vocabularyDao.getAllVocabulary(currentTime).map { it.toVocabulary() }
     }
 
     // suspend fun getFavorites(): List<VocabularyEntity> = vocabularyDao.getFavorites()
@@ -18,6 +18,15 @@ class VocabularyRepository @Inject constructor(private val vocabularyDao: Vocabu
     suspend fun updateSrs(id: String, srsStatus: SrsStatus, dueDate: Long) {
         vocabularyDao.updateSrs(id, srsStatus, dueDate)
     }
+
+    suspend fun updateNote(
+        id: String,
+        note: String
+    ) = vocabularyDao.updateNote(id, note)
+
+    suspend fun addReport(
+        id: String
+    ) = vocabularyDao.addReport(id)
 
     suspend fun getCountNewOrNope(): Int {
         return vocabularyDao.getCountNewOrNope()

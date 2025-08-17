@@ -35,6 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.febriandev.vocary.MainActivity
+import com.febriandev.vocary.ui.auth.AuthActivity
+import com.febriandev.vocary.ui.components.CustomAnimatedModalSheet
+import com.febriandev.vocary.utils.Constant.NOTIFICATION
+import com.febriandev.vocary.utils.Prefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,8 +47,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileScreen(
     showProfile: Boolean,
-    isGreeting: Boolean,
-    isMotivation: Boolean,
     scope: CoroutineScope,
     context: Context,
     onGreeting: (greeting: Boolean) -> Unit,
@@ -52,51 +55,51 @@ fun ProfileScreen(
     onDismiss: () -> Unit
 ) {
 
-//    var isCheckedNotification by remember { mutableStateOf(Prefs[NOTIFICATION, true]) }
-//
-//    var isAbout by remember { mutableStateOf(false) }
-//    var isLogout by remember { mutableStateOf(false) }
-//    var logout by remember {
-//        mutableStateOf(false)
-//    }
-//
-//    CustomAnimatedModalSheet(show = showProfile, onDismiss = onDismiss) {
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//        ) {
-//            Text(text = "Setting", style = MaterialTheme.typography.headlineMedium)
-//            Spacer(Modifier.height(16.dp))
-//            Card(
-//                modifier = Modifier.fillMaxWidth(),
-//                shape = RoundedCornerShape(16.dp),
-//                elevation = CardDefaults.cardElevation(2.dp),
-//                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-//            ) {
-//
-//                Column {
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 16.dp, vertical = 8.dp),
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.SpaceBetween
-//                    ) {
-//
-//                        Row {
-//                            Icon(
-//                                imageVector = Icons.Default.Edit,
-//                                contentDescription = "Greeting",
-//                                tint = MaterialTheme.colorScheme.primary
-//                            )
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Text(
-//                                text = "Greeting",
-//                                style = MaterialTheme.typography.bodyMedium,
-//                                color = MaterialTheme.colorScheme.onSurface
-//                            )
-//                        }
-//
+    var isCheckedNotification by remember { mutableStateOf(Prefs[NOTIFICATION, true]) }
+
+    var isAbout by remember { mutableStateOf(false) }
+    var isLogout by remember { mutableStateOf(false) }
+    var logout by remember {
+        mutableStateOf(false)
+    }
+
+    CustomAnimatedModalSheet(show = showProfile, onDismiss = onDismiss) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(text = "Setting", style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(16.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(2.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Greeting",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Greeting",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
 //                        Switch(
 //                            checked = isGreeting,
 //                            onCheckedChange = {
@@ -104,32 +107,32 @@ fun ProfileScreen(
 //                                onGreeting(it)
 //                            }
 //                        )
-//                    }
-//
-//                    Divider()
-//
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 16.dp, vertical = 8.dp),
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.SpaceBetween
-//                    ) {
-//
-//                        Row {
-//                            Icon(
-//                                imageVector = Icons.Default.DriveFileRenameOutline,
-//                                contentDescription = "Motivation",
-//                                tint = MaterialTheme.colorScheme.primary
-//                            )
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Text(
-//                                text = "Motivation",
-//                                style = MaterialTheme.typography.bodyMedium,
-//                                color = MaterialTheme.colorScheme.onSurface
-//                            )
-//                        }
-//
+                    }
+
+                    Divider()
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.DriveFileRenameOutline,
+                                contentDescription = "Motivation",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Motivation",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
 //                        Switch(
 //                            checked = isMotivation,
 //                            onCheckedChange = {
@@ -137,151 +140,151 @@ fun ProfileScreen(
 //                                onMotivation(it)
 //                            }
 //                        )
-//                    }
-//
-//                    Divider()
-//
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 16.dp, vertical = 8.dp),
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.SpaceBetween
-//                    ) {
-//                        Row {
-//                            Icon(
-//                                imageVector = Icons.Default.Notifications,
-//                                contentDescription = "Notification",
-//                                tint = MaterialTheme.colorScheme.primary
-//                            )
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Text(
-//                                text = "Notification",
-//                                style = MaterialTheme.typography.bodyMedium,
-//                                color = MaterialTheme.colorScheme.onSurface
-//                            )
-//                        }
-//
-//                        Switch(
-//                            checked = isCheckedNotification,
-//                            onCheckedChange = {
-//                                isCheckedNotification = it
-//                                Prefs[NOTIFICATION] = it
-//                            }
-//                        )
-//
-//                    }
-//
-//                    Divider()
-//
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 16.dp, vertical = 16.dp)
-//                            .clickable {
-//                                isAbout = true
-//                            },
-//                        verticalAlignment = Alignment.CenterVertically
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Default.Info,
-//                            contentDescription = "Info",
-//                            tint = MaterialTheme.colorScheme.primary
-//                        )
-//                        Spacer(modifier = Modifier.width(8.dp))
-//                        Text(
-//                            text = "About",
-//                            style = MaterialTheme.typography.bodyMedium,
-//                            color = MaterialTheme.colorScheme.onSurface
-//                        )
-//
-//                    }
-//
-//                    Divider()
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(horizontal = 16.dp, vertical = 16.dp)
-//                            .clickable {
-//                                isLogout = true
-//                            },
-//                        verticalAlignment = Alignment.CenterVertically
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Default.Logout,
-//                            contentDescription = "Logout",
-//                            tint = MaterialTheme.colorScheme.primary
-//                        )
-//                        Spacer(modifier = Modifier.width(8.dp))
-//                        Text(
-//                            text = "Logout",
-//                            style = MaterialTheme.typography.bodyMedium,
-//                            color = MaterialTheme.colorScheme.onSurface
-//                        )
-//
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    if (isAbout) {
-//        AlertDialog(
-//            onDismissRequest = { isAbout = false },
-//            title = { Text("Vocery") },
-//            text = {
-//                Text("Vocery - Vocab Mastery is an interactive and user-friendly vocabulary learning app designed to help learners of all levels master English words effectively")
-//            },
-//            containerColor = baseScreenColor,
-//            confirmButton = {
-//                Text(text = "OK", modifier = Modifier.clickable {
-//                    isAbout = false
-//                })
-//            },
-//            dismissButton = {
-//
-//            }
-//        )
-//    }
-//
-//    if (isLogout) {
-//        AlertDialog(
-//            onDismissRequest = { isLogout = false },
-//            title = { Text("Are you sure?") },
-//            text = {
-//                Text("You'll lose all your data")
-//            },
-//            containerColor = baseScreenColor,
-//            confirmButton = {
-//                Text(text = "Yes", modifier = Modifier.clickable {
-//                    scope.launch {
-//                        logout = true
-//                        isLogout = false
-//
-//                        //clear all data
-//                        Prefs.clear()
-//                        onDeleteData.invoke()
-//
-//                        delay(3000)
-//
-//                        logout = false
-//                        val intent = Intent(context, MainActivity::class.java)
-//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                        context.startActivity(intent)
-//                        (context as Activity).finish()
-//                    }
-//                })
-//            },
-//            dismissButton = {
-//                Text(text = "No", modifier = Modifier.clickable { isLogout = false })
-//            }
-//        )
-//    }
-//
-//    if (logout) {
+                    }
+
+                    Divider()
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Notification",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Notification",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        Switch(
+                            checked = isCheckedNotification,
+                            onCheckedChange = {
+                                isCheckedNotification = it
+                                Prefs[NOTIFICATION] = it
+                            }
+                        )
+
+                    }
+
+                    Divider()
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            .clickable {
+                                isAbout = true
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Info",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "About",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                    }
+
+                    Divider()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            .clickable {
+                                isLogout = true
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Logout,
+                            contentDescription = "Logout",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Logout",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                    }
+                }
+            }
+        }
+    }
+
+    if (isAbout) {
+        AlertDialog(
+            onDismissRequest = { isAbout = false },
+            title = { Text("Vocery") },
+            text = {
+                Text("Vocary - Vocab Mastery is an interactive and user-friendly vocabulary learning app designed to help learners of all levels master English words effectively")
+            },
+            containerColor = MaterialTheme.colorScheme.background,
+            confirmButton = {
+                Text(text = "OK", modifier = Modifier.clickable {
+                    isAbout = false
+                })
+            },
+            dismissButton = {
+
+            }
+        )
+    }
+
+    if (isLogout) {
+        AlertDialog(
+            onDismissRequest = { isLogout = false },
+            title = { Text("Are you sure?") },
+            text = {
+                Text("You'll lose all your data")
+            },
+            containerColor = MaterialTheme.colorScheme.background,
+            confirmButton = {
+                Text(text = "Yes", modifier = Modifier.clickable {
+                    scope.launch {
+                        logout = true
+                        isLogout = false
+
+                        //clear all data
+                        Prefs.clear()
+                        onDeleteData.invoke()
+
+                        delay(3000)
+
+                        logout = false
+                        val intent = Intent(context, AuthActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        context.startActivity(intent)
+                        (context as Activity).finish()
+                    }
+                })
+            },
+            dismissButton = {
+                Text(text = "No", modifier = Modifier.clickable { isLogout = false })
+            }
+        )
+    }
+
+    if (logout) {
 //        ProgressDialog {
 //
 //        }
-//    }
+    }
 
 }

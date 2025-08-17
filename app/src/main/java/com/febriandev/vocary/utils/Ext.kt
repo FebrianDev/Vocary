@@ -1,9 +1,15 @@
 package com.febrian.vocery.utils
 
+import android.app.Activity
+import android.app.WallpaperManager
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
@@ -11,10 +17,12 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.unit.Dp
 import androidx.core.content.FileProvider
 import com.febriandev.vocary.BuildConfig
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.microsoft.cognitiveservices.speech.CancellationReason
 import com.microsoft.cognitiveservices.speech.ResultReason
 import com.microsoft.cognitiveservices.speech.SpeechConfig
@@ -29,6 +37,7 @@ import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.UUID
+import kotlin.math.ln
 
 suspend fun downloadAndSaveAudio(context: Context, url: String, fileName: String): File {
     val file = File(context.filesDir, fileName)
@@ -85,7 +94,8 @@ fun Context.showMessage(message: String) {
 }
 
 fun speakText(text: String) {
-    val speechConfig = SpeechConfig.fromSubscription(BuildConfig.API_TEXT_TO_SPEECH, "southeastasia")
+    val speechConfig =
+        SpeechConfig.fromSubscription(BuildConfig.API_TEXT_TO_SPEECH, "southeastasia")
 
     // Optional: atur suara (voice)
     speechConfig.speechSynthesisVoiceName = "en-US-AvaMultilingualNeural"
@@ -129,10 +139,19 @@ fun shareImage(context: Context, bitmap: Bitmap) {
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
-    context.startActivity(Intent.createChooser(shareIntent, "Share via"))
+    val chooser = Intent.createChooser(shareIntent, "Share via").apply {
+        // Tambahkan flag disini
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    context.startActivity(Intent.createChooser(chooser, "Share via"))
 }
 
-fun saveImageToGallery(context: Context, bitmap: Bitmap, fileName: String = "screenshot_${System.currentTimeMillis()}.png") {
+fun saveImageToGallery(
+    context: Context,
+    bitmap: Bitmap,
+    fileName: String = "screenshot_${System.currentTimeMillis()}.png"
+) {
     val fos: OutputStream?
     val imageUri: Uri?
 
@@ -148,7 +167,8 @@ fun saveImageToGallery(context: Context, bitmap: Bitmap, fileName: String = "scr
         imageUri = uri
         fos = uri?.let { resolver.openOutputStream(it) }
     } else {
-        val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val imagesDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         val image = File(imagesDir, fileName)
         fos = FileOutputStream(image)
         imageUri = Uri.fromFile(image)
@@ -159,6 +179,76 @@ fun saveImageToGallery(context: Context, bitmap: Bitmap, fileName: String = "scr
         Toast.makeText(context, "Image saved!", Toast.LENGTH_SHORT).show()
     }
 }
+
+fun copyText(context: Context, text: String) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("Copied Text", text)
+    clipboard.setPrimaryClip(clip)
+
+    context.showMessage("Copied to clipboard")
+}
+
+
+fun setAsWallpaper(context: Context, capturedImage: Bitmap?) {
+    if (capturedImage == null) {
+        context.showMessage("No image to set as wallpaper")
+        return
+    }
+
+    try {
+        val wallpaperManager = WallpaperManager.getInstance(context)
+
+        wallpaperManager.setBitmap(capturedImage)
+
+        // wallpaperManager.setBitmap(scaledBitmap)
+        context.showMessage("Wallpaper set successfully")
+    } catch (e: Exception) {
+        e.printStackTrace()
+        context.showMessage("Failed to set wallpaper: ${e.message}")
+    }
+}
+
+fun imageBitmapWithBackground(image: ImageBitmap, backgroundColor: Int): Bitmap {
+    val original = image.asAndroidBitmap()
+
+    val result = Bitmap.createBitmap(original.width, original.height, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(result)
+
+    // Gambar background
+    val paint = Paint()
+    paint.color = backgroundColor
+    canvas.drawRect(0f, 0f, original.width.toFloat(), original.height.toFloat(), paint)
+
+    // Gambar image di atas background
+    canvas.drawBitmap(original, 0f, 0f, null)
+
+    return result
+}
+
+
+fun surfaceWithTonalElevation(
+    surface: Color,
+    surfaceTint: Color,
+    elevation: Dp
+): Color {
+    if (elevation.value <= 0f) return surface
+
+    val alpha = ((4.5f * ln((elevation.value + 1).toDouble()) + 2f) / 100f).toFloat()
+    return compositeColors(surfaceTint.copy(alpha = alpha), surface)
+}
+
+fun compositeColors(foreground: Color, background: Color): Color {
+    val fgAlpha = foreground.alpha
+    val bgAlpha = background.alpha
+    val a = fgAlpha + bgAlpha * (1 - fgAlpha)
+
+    val r = (foreground.red * fgAlpha + background.red * bgAlpha * (1 - fgAlpha)) / a
+    val g = (foreground.green * fgAlpha + background.green * bgAlpha * (1 - fgAlpha)) / a
+    val b = (foreground.blue * fgAlpha + background.blue * bgAlpha * (1 - fgAlpha)) / a
+
+    return Color(r, g, b, a)
+}
+
 
 fun generateRandomId(): String {
     return UUID.randomUUID().toString()

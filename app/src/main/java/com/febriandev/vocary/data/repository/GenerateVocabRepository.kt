@@ -81,6 +81,23 @@ class GenerateVocabRepository @Inject constructor(
         }
     }
 
+    suspend fun getWord(word: String): VocabularyEntity? {
+        return try {
+            val dictionaryResponse = dictionaryApi.getWordDefinition(word)
+            val wordsResponse = wordsApiService.getWordInfo(
+                word = word,
+                apiKey = BuildConfig.API_WORDS_API
+            )
+
+            val vocabulary = combineResponses(wordsResponse, dictionaryResponse)
+            vocabulary
+        } catch (e: Exception) {
+            Log.e("insertDetail", "Error inserting detail for word $word", e)
+            null
+        }
+    }
+
+
     fun combineResponses(
         wordsApi: WordsApiResponse?,
         dictionaryApi: List<DictionaryResponse>?

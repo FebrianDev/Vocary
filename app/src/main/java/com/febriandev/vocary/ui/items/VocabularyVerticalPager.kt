@@ -37,7 +37,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun VocabularyVerticalPager(
     vocabs: List<Vocabulary>,
-    onShareClick: () -> Unit,
+    shouldCaptureScreenshot: Boolean,
+    onNoteCLick: (vocabulary: Vocabulary) -> Unit,
+    onShareClick: (vocabulary: Vocabulary) -> Unit,
     onProgress: () -> Unit,
     pagerState: PagerState = rememberPagerState(initialPage = 0),
     applicationContext: Context = LocalContext.current,
@@ -47,8 +49,6 @@ fun VocabularyVerticalPager(
     val coroutineScope = rememberCoroutineScope()
 
     var showTranslate by remember { mutableStateOf(false) }
-
-    var showNote by remember { mutableStateOf(false) }
 
     var selectedVocab by remember { mutableStateOf<Vocabulary?>(null) }
 
@@ -98,6 +98,7 @@ fun VocabularyVerticalPager(
                 ?: "",
             isFavorite = vocabulary.isFavorite,
             srsStatus = vocabulary.srsStatus,
+            shouldCaptureScreenshot = shouldCaptureScreenshot,
             onPlayPronunciationClick = {
                 coroutineScope.launch {
                     try {
@@ -130,14 +131,15 @@ fun VocabularyVerticalPager(
                 selectedVocab = vocabulary
                 showTranslate = true
             },
-            onShareClick = onShareClick,
-            onNotes = { showNote = true },
+            onShareClick = { onShareClick.invoke(vocabulary) },
+            onNotes = { onNoteCLick.invoke(vocabulary) },
             onFavoriteClick = {
                 vocabViewModel.toggleFavorite(vocabulary.id)
             }) {
             if (it == SrsStatus.KNOWN) onProgress.invoke()
             vocabViewModel.updateSrsStatus(vocabulary.id, it)
         }
+
     }
 
     VocabularyInfo(showInfo, selectedVocab, bottomSheetState) {

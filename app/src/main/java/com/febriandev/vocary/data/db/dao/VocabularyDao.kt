@@ -19,11 +19,16 @@ interface VocabularyDao {
     @Query(
         """
     SELECT DISTINCT * 
-    FROM vocabulary
-    ORDER BY srsDueDate ASC, id DESC
-"""
+    FROM vocabulary 
+    WHERE isReport = 0
+      AND (srsStatus = 'NEW' OR srsDueDate <= :currentTime)
+    ORDER BY 
+      CASE WHEN srsStatus = 'NEW' THEN 0 ELSE 1 END,
+      srsDueDate ASC,
+      id DESC
+    """
     )
-    suspend fun getAllVocabulary(): List<VocabularyEntity>
+    suspend fun getAllVocabulary(currentTime:Long): List<VocabularyEntity>
 
     @Query(
         """
@@ -37,6 +42,29 @@ interface VocabularyDao {
         id: String,
         status: SrsStatus,
         dueDate: Long
+    )
+
+    @Query(
+        """
+        UPDATE vocabulary 
+        SET note = :note
+        WHERE id = :id
+    """
+    )
+    suspend fun updateNote(
+        id: String,
+        note: String
+    )
+
+    @Query(
+        """
+        UPDATE vocabulary 
+        SET isReport=1
+        WHERE id = :id
+    """
+    )
+    suspend fun addReport(
+        id: String
     )
 
     @Query(

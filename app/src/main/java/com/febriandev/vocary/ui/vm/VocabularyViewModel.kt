@@ -33,12 +33,54 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
 
     fun getAllVocabulary() {
         viewModelScope.launch {
-            _vocabs.value = repository.getAllVocabulary()
+
+            val now = System.currentTimeMillis()
+
+            val vocabList = repository.getAllVocabulary(now)
+            val finalList = vocabList.map { vocab ->
+                if (vocab.srsDueDate <= now) {
+                    vocab.copy(srsStatus = SrsStatus.NEW)
+                } else vocab
+            }
+
+            _vocabs.value = finalList
+
         }
     }
 
     suspend fun getCountNewOrNope(): Int {
         return repository.getCountNewOrNope()
+    }
+
+    fun updateNote(id: String, note: String) = viewModelScope.launch {
+        repository.updateNote(id, note)
+
+        // Update state di memori supaya UI realtime
+        val updatedList = _vocabs.value.map { vocab ->
+            if (vocab.id == id) {
+                vocab.copy(note = note)
+            } else vocab
+        }
+        _vocabs.value = updatedList
+
+        // Kirim UI message
+        _uiMessage.send("Note for \"${updatedList.first { it.id == id }.word}\" updated")
+    }
+
+    fun addReport(
+        id: String
+    ) = viewModelScope.launch {
+
+        val reportedWord = _vocabs.value.firstOrNull { it.id == id }?.word ?: ""
+
+        // Update DB
+        repository.addReport(id)
+
+        // Hapus dari list
+        _vocabs.value = _vocabs.value.filter { it.id != id }
+
+        // Kirim pesan
+        _uiMessage.send("\"$reportedWord\" successfully reported")
     }
 
     fun updateSrsStatus(id: String, status: SrsStatus) = viewModelScope.launch {
@@ -71,14 +113,13 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
                 vocab.copy(
                     srsStatus = status,
                     srsDueDate = dueDate,
-                   // srsLastReviewed = now
+                    // srsLastReviewed = now
                 )
             } else vocab
         }
 
         _vocabs.value = updatedList
     }
-
 
 
     fun toggleFavorite(id: String) = viewModelScope.launch {
@@ -97,6 +138,26 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
 
                 // Update di UI state
                 vocab.copy(isFavorite = newFavorite)
+            } else vocab
+        }
+
+        _vocabs.value = updatedList
+    }
+
+    fun addToFavorite(id: String) = viewModelScope.launch {
+        val updatedList = _vocabs.value.map { vocab ->
+            if (vocab.id == id) {
+                if (!vocab.isFavorite) {
+                    // Belum favorite → tambahkan
+                    repository.addToFavorite(id)
+                    _uiMessage.send("\"${vocab.word}\" successfully added to favorites")
+                    vocab.copy(isFavorite = true)
+                } else {
+                    // Sudah favorite → tetap panggil addToFavorite, tapi tidak ubah state
+                    // repository.addToFavorite(id)
+                    _uiMessage.send("\"${vocab.word}\" is already in favorites")
+                    vocab
+                }
             } else vocab
         }
 

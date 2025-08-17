@@ -10,16 +10,20 @@ import com.febriandev.vocary.data.response.PhoneticResponse
 @TypeConverters(VocabularyConverters::class)
 data class VocabularyEntity(
     @PrimaryKey
-    val id:String,
+    val id: String,
     val word: String,
     val phonetics: List<PhoneticEntity> = emptyList(),
     val definitions: List<UnifiedDefinitionEntity> = emptyList(),
     val sourceUrls: List<String> = emptyList(),
 
+    val note: String = "",
+
     val isFavorite: Boolean = false,
     val isHistory: Boolean = false,
     val favoriteTimestamp: Long? = null,
     val historyTimestamp: Long? = null,
+
+    val isReport: Boolean = false,
 
     // --- SRS fields ---
     val srsDueDate: Long = System.currentTimeMillis(), // kapan kata ini akan muncul lagi

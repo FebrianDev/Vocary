@@ -20,7 +20,7 @@ object AppModule {
             application,
             AppDatabase::class.java,
             "vocary.db"
-        ).fallbackToDestructiveMigration().allowMainThreadQueries().build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
@@ -31,6 +31,19 @@ object AppModule {
     @Singleton
     fun provideVocabularyDao(db: AppDatabase) = db.vocabularyDao()
 
+    @Provides
+    @Singleton
+    fun provideGameSessionDao(db: AppDatabase) = db.gameSessionDao()
 
+    @Provides
+    @Singleton
+    fun provideProgressDao(db: AppDatabase) = db.dailyProgressDao()
 
+    @Provides
+    @Singleton
+    fun provideStreakDao(db: AppDatabase) = db.streakDao()
+    
+    @Provides
+    @Singleton
+    fun provideUserDao(db: AppDatabase) = db.userDao()
 }
