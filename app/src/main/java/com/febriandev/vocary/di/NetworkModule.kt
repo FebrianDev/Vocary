@@ -4,6 +4,9 @@ import com.febriandev.vocary.BuildConfig
 import com.febriandev.vocary.data.api.DictionaryApiService
 import com.febriandev.vocary.data.api.OpenAiApiService
 import com.febriandev.vocary.data.api.WordsApiService
+import com.febriandev.vocary.data.response.PronunciationDeserializer
+import com.febriandev.vocary.data.response.PronunciationResponse
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,10 +60,19 @@ object NetworkModule {
     @Provides
     @Singleton
     @Words
-    fun provideWordsRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl(BuildConfig.BASE_URL_WORDS_API)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    fun provideWordsRetrofit(): Retrofit {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(
+                PronunciationResponse::class.java,
+                PronunciationDeserializer()
+            )
+            .create()
+
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL_WORDS_API)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+    }
 
 //    @Provides
 //    @Singleton

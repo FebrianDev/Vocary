@@ -3,10 +3,15 @@ package com.febriandev.vocary.ui.vm
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.febriandev.vocary.data.db.entity.SrsStatus
+import com.febriandev.vocary.data.db.entity.VocabularyEntity
 import com.febriandev.vocary.data.repository.VocabularyRepository
 import com.febriandev.vocary.domain.Vocabulary
+import com.febriandev.vocary.ui.components.SortOrder
+import com.febriandev.vocary.ui.components.SortType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -148,13 +153,10 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
         val updatedList = _vocabs.value.map { vocab ->
             if (vocab.id == id) {
                 if (!vocab.isFavorite) {
-                    // Belum favorite → tambahkan
                     repository.addToFavorite(id)
                     _uiMessage.send("\"${vocab.word}\" successfully added to favorites")
                     vocab.copy(isFavorite = true)
                 } else {
-                    // Sudah favorite → tetap panggil addToFavorite, tapi tidak ubah state
-                    // repository.addToFavorite(id)
                     _uiMessage.send("\"${vocab.word}\" is already in favorites")
                     vocab
                 }
@@ -171,5 +173,18 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
             repository.addToHistory(vocab.id)
         }
     }
+
+    fun insertIfNotExists(vocabulary: VocabularyEntity) {
+        viewModelScope.launch {
+            val existing = repository.getVocabularyByWord(vocabulary.word)
+            if (existing == null) {
+                repository.insertVocabulary(vocabulary)
+                _uiMessage.send("\"${vocabulary.word}\" successfully added to my own word")
+            } else {
+                _uiMessage.send("\"${vocabulary.word}\" already have added to my own word")
+            }
+        }
+    }
+
 
 }

@@ -1,18 +1,26 @@
 package com.febriandev.vocary
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,20 +31,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Games
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -44,19 +52,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import com.composables.icons.lucide.GraduationCap
+import com.composables.icons.lucide.Lucide
 import com.febriandev.vocary.domain.Vocabulary
+import com.febriandev.vocary.ui.components.LoadingDialogContent
+import com.febriandev.vocary.ui.components.VocabularyInfo
 import com.febriandev.vocary.ui.components.VocabularyNote
 import com.febriandev.vocary.ui.components.VocabularyShare
 import com.febriandev.vocary.ui.components.VocabularyTopBar
-import com.febriandev.vocary.ui.streaks.StreakScreen
 import com.febriandev.vocary.ui.content.ContentScreen
 import com.febriandev.vocary.ui.items.VocabularyVerticalPager
 import com.febriandev.vocary.ui.minigame.MiniGameActivity
 import com.febriandev.vocary.ui.profile.ProfileScreen
+import com.febriandev.vocary.ui.progress.ProgressViewModel
+import com.febriandev.vocary.ui.streaks.StreakScreen
+import com.febriandev.vocary.ui.streaks.StreakViewModel
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.UserViewModel
 import com.febriandev.vocary.ui.vm.VocabularyViewModel
+import com.febriandev.vocary.utils.Constant.DAILY_GOAL
 import com.febriandev.vocary.utils.Constant.LEVEL
+import com.febriandev.vocary.utils.Constant.OPEN_APP
 import com.febriandev.vocary.utils.Constant.TOPIC
 import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.utils.ScreenshotBox
@@ -69,7 +88,11 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
     private val vocabViewModel: VocabularyViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
+    private val progressViewModel: ProgressViewModel by viewModels()
+    private val streakViewModel: StreakViewModel by viewModels()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,15 +100,30 @@ class MainActivity : BaseActivity() {
         setContent {
             VocaryTheme {
 
+                val PROGRESS_MAX = 10
+
                 LaunchedEffect(Unit) {
-                    if (vocabViewModel.getCountNewOrNope() <= 10) startGenerateProcess(
-                        "Common English Everyday Life",
-                        "Intermediate"
-                    )
+                    userViewModel.getUser()
+                    val user = userViewModel.getCurrentUser()
+//                    if (user != null) {
+//                        if (vocabViewModel.getCountNewOrNope() <= 15) startGenerateProcess(
+//                            user.vocabTopic ?: "Common English",
+//                            user.vocabLevel ?: "Intermediate"
+//                        )
+//                    }
+
+//                    startGenerateProcess(
+//                        "Common English",
+//                        "Intermediate"
+//                    )
+
+
+                    progressViewModel.getProgress()
+                    streakViewModel.markStreak(OPEN_APP, true)
                 }
 
-                var progressNow by remember { mutableIntStateOf(0) }
-                val progressMax = 10
+                val dailyProgress by progressViewModel.dailyProgress.collectAsState()
+                val user by userViewModel.user.collectAsState()
 
                 val coroutineScope = rememberCoroutineScope()
 
@@ -95,18 +133,17 @@ class MainActivity : BaseActivity() {
                 var showLoadingDialog by remember { mutableStateOf(false) }
 
                 var showContent by remember { mutableStateOf(false) }
+                var showInfo by remember { mutableStateOf(false) }
                 var showNote by remember { mutableStateOf(false) }
                 var showShare by remember { mutableStateOf(false) }
                 var showProfile by remember { mutableStateOf(false) }
 
-                var selectedVocab by remember { mutableStateOf<Vocabulary>(Vocabulary()) }
+                var selectedVocab by remember { mutableStateOf(Vocabulary()) }
 
                 val captureController = remember { ScreenshotController() }
 
                 var capturedImage by remember { mutableStateOf<ImageBitmap?>(null) }
                 var shouldCaptureScreenshot by remember { mutableStateOf(false) }
-
-                val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
                 var level by remember { mutableStateOf(Prefs[LEVEL, "General Vocabulary"]) }
                 var topic by remember { mutableStateOf(Prefs[TOPIC, "Beginner (A1)"]) }
@@ -141,24 +178,31 @@ class MainActivity : BaseActivity() {
 
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(1f)
+                                .fillMaxSize()
                                 .padding(24.dp),
                             verticalArrangement = Arrangement.SpaceBetween,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+
                             // Top bar: Streak & Today
                             if (!shouldCaptureScreenshot) {
-                                VocabularyTopBar(
-                                    name = "Febrian",
-                                    streakDays = 8,
-                                    todayCount = progressNow
-                                )
+                                if (user != null) {
+                                    VocabularyTopBar(
+                                        name = user?.name ?: "",
+                                        streakDays = 8,
+                                        todayCount = dailyProgress?.progress ?: 0,
+                                        dailyGoal = user?.targetVocabulary ?: 100
+                                    )
+                                }
                             }
 
                             VocabularyVerticalPager(
                                 vocabs,
                                 shouldCaptureScreenshot,
+                                onInfoCLick = {
+                                    selectedVocab = it
+                                    showInfo = true
+                                },
                                 onNoteCLick = {
                                     selectedVocab = it
                                     showNote = true
@@ -168,19 +212,65 @@ class MainActivity : BaseActivity() {
                                     shouldCaptureScreenshot = true
                                 },
 
-                                onProgress = {
-                                    progressNow += 1
+                                onProgress = { id ->
+                                    progressViewModel.onVocabularyKnown(id)
+                                    if (dailyProgress != null && dailyProgress?.progress!! >= PROGRESS_MAX) {
+                                        streakViewModel.markStreak(DAILY_GOAL, true)
+                                    }
                                 },
+                                active = true,
                                 pagerState,
                                 applicationContext,
                                 vocabViewModel
                             )
 
                             if (!shouldCaptureScreenshot) {
-                                Spacer(modifier = Modifier.height(24.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
 
                             if (!shouldCaptureScreenshot) {
+
+                                val isLastPage =
+                                    pagerState.currentPage == (pagerState.pageCount - 1)
+
+                                AnimatedVisibility(visible = isLastPage) {
+                                    Surface(
+                                        shape = RoundedCornerShape(50),
+                                        shadowElevation = 4.dp,
+                                        color = MaterialTheme.colorScheme.surface,
+                                        tonalElevation = 4.dp,
+                                        onClick = {
+                                            showLoadingDialog = true
+                                            coroutineScope.launch {
+                                                val user = userViewModel.getCurrentUser()
+                                                if (user != null) {
+                                                    startGenerateProcess(
+                                                        user.vocabTopic ?: "Common English",
+                                                        user.vocabLevel ?: "Intermediate"
+                                                    )
+                                                    delay(13000)
+                                                    vocabViewModel.getAllVocabulary()
+                                                    delay(2000)
+                                                    showLoadingDialog = false
+                                                    pagerState.scrollToPage(0)
+                                                }
+                                            }
+                                        },
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(12.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            Text("Generate New Vocab")
+                                        }
+                                    }
+                                }
+
+                                Spacer(Modifier.height(16.dp))
+
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth(),
@@ -224,7 +314,7 @@ class MainActivity : BaseActivity() {
                                             modifier = Modifier.padding(12.dp)
                                         ) {
                                             Icon(
-                                                Icons.Default.Games,
+                                                Lucide.GraduationCap,
                                                 contentDescription = "Info",
                                                 tint = MaterialTheme.colorScheme.primary,
                                                 modifier = Modifier
@@ -234,41 +324,9 @@ class MainActivity : BaseActivity() {
                                             Spacer(Modifier.width(8.dp))
 
                                             Text(
-                                                "Play Games",
+                                                "Practice",
                                                 style = MaterialTheme.typography.bodyMedium
                                             )
-                                        }
-                                    }
-
-                                    val isLastPage =
-                                        pagerState.currentPage == (pagerState.pageCount - 1)
-
-                                    AnimatedVisibility(visible = isLastPage) {
-                                        Surface(
-                                            shape = RoundedCornerShape(50),
-                                            shadowElevation = 4.dp,
-                                            onClick = {
-//                                        showLoadingDialog = true
-//                                        vocabViewModel.startGenerateProcess(
-//                                            Prefs[TOPIC, "General Vocabulary"],
-//                                            Prefs[LEVEL, "Beginner (A1)"]
-//                                        )
-//                                        coroutineScope.launch {
-//                                            delay(13000) // Simulasi proses generate 10 detik
-//                                            vocabViewModel.getAllDetailVocab()
-//                                            delay(2000)
-//                                            showLoadingDialog = false
-//                                            pagerState.scrollToPage(0) // Kembali ke halaman awal
-//                                        }
-                                            },
-                                        ) {
-                                            Row(
-                                                modifier = Modifier
-                                                    .padding(12.dp),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Text("Generate New Vocab")
-                                            }
                                         }
                                     }
 
@@ -296,8 +354,11 @@ class MainActivity : BaseActivity() {
                             }
                         }
 
-                        VocabularyNote(selectedVocab, showNote, vocabViewModel) { showNote = false }
+                        VocabularyInfo(showInfo, selectedVocab, applicationContext) {
+                            showInfo = false
+                        }
 
+                        VocabularyNote(selectedVocab, showNote, vocabViewModel) { showNote = false }
 
                         VocabularyShare(
                             selectedVocab,
@@ -313,52 +374,12 @@ class MainActivity : BaseActivity() {
                         }
 
                         StreakScreen()
-
-//                        AlertDialog(
-//                            containerColor = MaterialTheme.colorScheme.background,
-//                            onDismissRequest = {
-//                                showDialog = false
-//                                shouldCaptureScreenshot = false
-//                                capturedImage = null
-//                            },
-//                            confirmButton = {
-//                                TextButton(onClick = {
-//                                    shouldCaptureScreenshot = false
-//                                    capturedImage?.let {
-//                                        saveImageToGallery(applicationContext, it.asAndroidBitmap())
-//                                    }
-//                                    showDialog = false
-//                                }) {
-//                                    Text("Download")
-//                                }
-//                            },
-//                            dismissButton = {
-//                                TextButton(onClick = {
-//                                    shouldCaptureScreenshot = false
-//                                    capturedImage?.let {
-//                                        shareImage(applicationContext, it.asAndroidBitmap())
-//                                    }
-//                                    showDialog = false
-//                                }) {
-//                                    Text("Share")
-//                                }
-//                            },
-//                            text = {
-//                                capturedImage?.let {
-//                                    Image(
-//                                        bitmap = it, contentDescription = null, modifier = Modifier
-//                                            .fillMaxWidth()
-//                                            .height(400.dp)
-//                                    )
-//                                }
-//                            }
-//                        )
-                        // }
                     }
-                    ContentScreen(showContent, applicationContext) {
+
+                    ContentScreen(user?.isPremium ?: true, showContent, applicationContext) {
                         showContent = false
                         if (level != Prefs[LEVEL, "Beginner (A1)"] || topic != Prefs[TOPIC, "General Vocabulary"]) {
-                            showLoadingDialog = true
+                            //  showLoadingDialog = true
                             level = Prefs[LEVEL, "Beginner (A1)"]
                             topic = Prefs[TOPIC, "General Vocabulary"]
 
@@ -367,13 +388,22 @@ class MainActivity : BaseActivity() {
 //                                Prefs[LEVEL, "Beginner (A1)"]
 //                            )
 
-                            coroutineScope.launch {
-                                delay(13000) // Simulasi proses generate 10 detik
-                                vocabViewModel.getAllVocabulary()
-                                delay(2000)
-                                showLoadingDialog = false
-                                pagerState.scrollToPage(0) // Kembali ke halaman awal
-                            }
+                            /*  coroutineScope.launch {
+
+                                  val user = userViewModel.getCurrentUser()
+                                  if (user != null && level != user.vocabLevel || topic != user?.vocabTopic) {
+  //                                    startGenerateProcess(
+  //                                        user?.vocabTopic ?: "Common English",
+  //                                        user?.vocabLevel ?: "Intermediate"
+  //                                    )
+
+                                      delay(13000) // Simulasi proses generate 10 detik
+                                      vocabViewModel.getAllVocabulary()
+                                      delay(2000)
+                                      showLoadingDialog = false
+                                      pagerState.scrollToPage(0) // Kembali ke halaman awal
+                                  }
+                              }*/
                         }
                     }
 //
@@ -382,22 +412,60 @@ class MainActivity : BaseActivity() {
                         coroutineScope,
                         applicationContext,
                         {
-                            //   isGreeting = it
-                        },
-                        {
-                            // isMotivation = it
-                        },
-                        {
                             // vocabViewModel.deleteAllData()
                         }) {
                         showProfile = false
                     }
+                }
 
-
+                if (showLoadingDialog) {
+                    AlertDialog(
+                        onDismissRequest = {},
+                        confirmButton = {},
+                        title = { Text("Generating Vocabulary...") },
+                        text = {
+                            LoadingDialogContent()
+                        },
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
                 }
             }
         }
     }
+
+    @Composable
+    fun FlyingButton() {
+        val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
+        val infiniteTransition = rememberInfiniteTransition()
+
+        // animasi Y (naik turun)
+        val offsetY by infiniteTransition.animateFloat(
+            initialValue = 0f,                     // mulai dari bawah
+            targetValue = -200f,                   // naik sejauh 200px
+            animationSpec = infiniteRepeatable(
+                animation = tween(2000, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse
+            )
+        )
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Button(
+                onClick = { /* action */ },
+                modifier = Modifier
+                    .padding(bottom = 32.dp)
+                    .graphicsLayer {
+                        translationY = offsetY
+                    }
+            ) {
+                Text("Fly")
+            }
+        }
+    }
+
 }
 
 

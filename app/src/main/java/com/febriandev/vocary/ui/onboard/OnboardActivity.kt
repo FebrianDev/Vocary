@@ -1,5 +1,7 @@
 package com.febriandev.vocary.ui.onboard
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -10,6 +12,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +30,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.febriandev.vocary.BaseActivity
+import com.febriandev.vocary.data.db.entity.UserEntity
+import com.febriandev.vocary.domain.AppUser
+import com.febriandev.vocary.ui.form.FormField
+import com.febriandev.vocary.ui.form.FormOptionField
+import com.febriandev.vocary.ui.form.FormOptionTopic
+import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.UserViewModel
 import com.febriandev.vocary.utils.Constant.GENDER
 import com.febriandev.vocary.utils.Constant.GOAL
 import com.febriandev.vocary.utils.Constant.LEVEL
@@ -35,22 +46,31 @@ import com.febriandev.vocary.utils.Constant.OLD
 import com.febriandev.vocary.utils.Constant.TOPIC
 import com.febriandev.vocary.utils.Constant.WORD
 import com.febriandev.vocary.utils.Prefs
-import com.febriandev.vocary.BaseActivity
-import com.febriandev.vocary.ui.form.FormField
-import com.febriandev.vocary.ui.form.FormOptionField
-import com.febriandev.vocary.ui.form.FormOptionTopic
-import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.utils.generateRandomId
+import com.febriandev.vocary.utils.getAppId
+import com.febriandev.vocary.utils.getDeviceName
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class OnboardActivity : BaseActivity() {
 
     private val onboardViewModel: OnboardViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val user: AppUser? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("user", AppUser::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra("user")
+        }
+
+        if (user?.name != null) onboardViewModel.name.value = user.name
+
         setContent {
             VocaryTheme {
 
@@ -62,10 +82,9 @@ class OnboardActivity : BaseActivity() {
                 val word by onboardViewModel.word.collectAsState()
                 val level by onboardViewModel.level.collectAsState()
                 val goal by onboardViewModel.goal.collectAsState()
-                val selectedCategory by onboardViewModel.selectedCategory.collectAsState()
                 val selectedTopic by onboardViewModel.selectedTopic.collectAsState()
 
-                BackHandler(enabled = formStep != FormStep.AUTH) {
+                BackHandler(enabled = formStep != FormStep.NAME) {
                     onboardViewModel.prevStep()
                 }
 
@@ -79,6 +98,7 @@ class OnboardActivity : BaseActivity() {
 
                     Column(
                         modifier = Modifier
+                            .background(MaterialTheme.colorScheme.background)
                             .fillMaxSize()
                             .padding(24.dp),
                         verticalArrangement = Arrangement.Center
@@ -86,14 +106,11 @@ class OnboardActivity : BaseActivity() {
 
                         when (step) {
 
-                            FormStep.AUTH -> {
-
-                            }
-
                             FormStep.NAME -> {
                                 Text(
                                     text = "What do you want to be called?",
-                                    style = MaterialTheme.typography.headlineMedium
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))
                                 FormField(name, "Enter your name") {
@@ -112,7 +129,8 @@ class OnboardActivity : BaseActivity() {
                                 )
                                 Text(
                                     text = "How old are you?",
-                                    style = MaterialTheme.typography.headlineMedium
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))
                                 olds.forEach { data ->
@@ -126,7 +144,8 @@ class OnboardActivity : BaseActivity() {
                                 val genders = listOf("Male", "Female", "Prefer not to say")
                                 Text(
                                     text = "What's your gender?",
-                                    style = MaterialTheme.typography.headlineMedium
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))
                                 genders.forEach { data ->
@@ -145,7 +164,8 @@ class OnboardActivity : BaseActivity() {
                                 )
                                 Text(
                                     text = "How many words do you want to learn in a week?",
-                                    style = MaterialTheme.typography.headlineMedium
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))
                                 words.forEach { data ->
@@ -159,7 +179,8 @@ class OnboardActivity : BaseActivity() {
                                 val levels = LevelType.entries.toTypedArray()
                                 Text(
                                     text = "What's your vocabulary level?",
-                                    style = MaterialTheme.typography.headlineMedium
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
 
                                 Spacer(modifier = Modifier.height(24.dp))
@@ -184,7 +205,8 @@ class OnboardActivity : BaseActivity() {
                                 )
                                 Text(
                                     text = "What's your specific goal?",
-                                    style = MaterialTheme.typography.headlineMedium
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))
                                 goals.forEach { data ->
@@ -194,30 +216,11 @@ class OnboardActivity : BaseActivity() {
                                 }
                             }
 
-
-//                FormStep.CATEGORY -> {
-//                    Text(
-//                        text = "What categories do you want to learn?",
-//                        style = MaterialTheme.typography.headlineMedium
-//                    )
-//                    val categories = CategoryType.entries.toTypedArray()
-//                    FlowRow {
-//                        repeat(categories.size) {
-//                            FormOptionCategories(
-//                                categoryType = categories[it],
-//                                isSelected = categories[it] == selectedCategory
-//                            ) { categoryType ->
-//                                onboardViewModel.onCategorySelected(categoryType)
-//                            }
-//                        }
-//                    }
-//
-//                }
-
                             FormStep.TOPIC -> {
                                 Text(
                                     text = "What topic do you want to learn?",
-                                    style = MaterialTheme.typography.headlineMedium
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 val topics = TopicType.entries.toTypedArray()
                                 LazyColumn(modifier = Modifier.fillMaxHeight(0.7f)) {
@@ -236,7 +239,6 @@ class OnboardActivity : BaseActivity() {
                         Spacer(modifier = Modifier.height(24.dp))
 
                         Column(
-                            // horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier.fillMaxWidth()
                         ) {
 
@@ -263,12 +265,39 @@ class OnboardActivity : BaseActivity() {
                                         Prefs[GOAL] = goal
                                         Prefs[TOPIC] = selectedTopic?.displayName
 
-                                       // onNavigateToLoading()
+                                        val userEntity = UserEntity(
+                                            id = user?.uid ?: generateRandomId(),
+                                            name = name,
+                                            email = user?.email ?: "",
+                                            photoUrl = "",
+                                            age = old.toIntOrNull(),
+                                            targetVocabulary = word.toIntOrNull() ?: 0,
+                                            learningGoal = goal,
+                                            vocabLevel = level,
+                                            vocabTopic = selectedTopic?.displayName,
+                                            isPremium = false, // default, nanti bisa diupdate dari Firestore/RevenueCat
+                                            premiumDuration = null,
+                                            deviceName = getDeviceName(),
+                                            deviceId = getAppId(applicationContext)
+                                        )
+
+                                        userViewModel.saveUser(userEntity)
+
+                                        val intent =
+                                            Intent(
+                                                applicationContext,
+                                                LoadingActivity::class.java
+                                            )
+
+                                        intent.putExtra("level", level)
+                                        intent.putExtra("topic", selectedTopic?.displayName)
+
+                                        startActivity(intent)
+                                        finish()
 
                                     }
                                 },
                                 enabled = when (formStep) {
-                                    FormStep.AUTH -> TODO()
                                     FormStep.NAME -> name.isNotBlank()
                                     FormStep.OLD -> old.isNotBlank()
                                     FormStep.GENDER -> gender.isNotBlank()
@@ -283,7 +312,7 @@ class OnboardActivity : BaseActivity() {
                             ) {
                                 Text(
                                     if (formStep == FormStep.TOPIC) "Start Learning" else "Next",
-                                    style = MaterialTheme.typography.labelLarge
+                                    style = MaterialTheme.typography.labelLarge,
                                 )
                             }
                         }

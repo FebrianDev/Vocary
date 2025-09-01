@@ -1,19 +1,27 @@
 package com.febriandev.vocary.ui.components
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.febriandev.vocary.domain.Vocabulary
+import com.febriandev.vocary.utils.showMessage
+import androidx.core.net.toUri
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,82 +29,132 @@ import com.febriandev.vocary.domain.Vocabulary
 fun VocabularyInfo(
     showSheet: Boolean,
     selectedVocab: Vocabulary?,
-    bottomSheetState: SheetState,
+    context: Context,
     onDismiss: () -> Unit
 ) {
 
-    if (showSheet && selectedVocab != null) {
-        ModalBottomSheet(
-            onDismissRequest = onDismiss,
-            sheetState = bottomSheetState,
-            modifier = Modifier.fillMaxWidth(),
-            containerColor = MaterialTheme.colorScheme.surface
+    if (selectedVocab == null) return
+
+    CustomAnimatedModalSheet2(
+        title = "Info",
+        show = showSheet,
+        onDismiss = onDismiss
+    ) {
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-            ) {
-                item {
-                    Text(
-                        "Word: ${selectedVocab.word}",
-                        style = MaterialTheme.typography.titleLarge
-                    )
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                // Word Info
+                Text(
+                    selectedVocab.word,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Text(
+                    "(${selectedVocab.phonetic})",
+                    style = MaterialTheme.typography.titleMedium
+                )
 
-                    Text(
-                        "Phonetic: ${selectedVocab.phonetic}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                // Definitions
+                Text(
+                    text = "Definitions",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
 
-                    Text(
-                        "Part of Speech: ${selectedVocab.partOfSpeech}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                selectedVocab.definitions.forEach { definition ->
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        "Definition:",
-                        style = MaterialTheme.typography.labelLarge
-                    )
-
-                    selectedVocab.definitions.forEach {
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.Top,
+                    ) {
                         Text(
-                            it.definition,
-                            style = MaterialTheme.typography.bodyMedium
+                            text = "Part of Speech:",
+                            style = MaterialTheme.typography.titleSmall,
                         )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            text = definition.partOfSpeech ?: "",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
 
-                        if (it.examples.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text("Examples:", style = MaterialTheme.typography.labelLarge)
-                            it.examples.forEach {
-                                Text("• $it", style = MaterialTheme.typography.bodySmall)
-                            }
-                        }
+                    Text(
+                        text = "Definition:",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                    Text(
+                        text = "- ${definition.definition}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 2.dp, start = 8.dp)
+                    )
 
-                        if (it.synonyms.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text("Synonyms:", style = MaterialTheme.typography.labelLarge)
+                    // Examples
+                    if (definition.examples.isNotEmpty()) {
+                        Text(
+                            text = "Examples:",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                        definition.examples.forEach { example ->
                             Text(
-                                it.synonyms.joinToString(", "),
-                                style = MaterialTheme.typography.bodySmall
+                                text = "- $example",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(start = 8.dp, top = 2.dp)
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    if (selectedVocab.sourceUrl.isNotBlank()) {
-                        Text(
-                            "Source: ${selectedVocab.sourceUrl}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                    // Synonyms
+                    if (definition.synonyms.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier
+                                .padding(top = 4.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.Top,
+                        ) {
+                            Text(
+                                text = "Synonyms:",
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = definition.synonyms.joinToString(", "),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(Modifier.height(12.dp))
+                }
+
+                // Source
+                if (selectedVocab.sourceUrl.isNotBlank()) {
+                    Text(
+                        text = "Source: ${selectedVocab.sourceUrl}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(top = 4.dp).clickable {
+                            selectedVocab.sourceUrl.let { url ->
+                                try {
+                                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    context.showMessage("Can't open link!")
+                                }
+                            }
+                        }
+                    )
                 }
             }
         }
+
     }
 }

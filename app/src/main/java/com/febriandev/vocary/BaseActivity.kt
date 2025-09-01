@@ -1,5 +1,6 @@
 package com.febriandev.vocary
 
+import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
@@ -24,6 +25,7 @@ abstract class BaseActivity : ComponentActivity() {
             it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED
         }
     }
+
 
     fun startGenerateProcess(topic: String, level: String) {
 

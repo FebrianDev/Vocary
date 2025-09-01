@@ -38,12 +38,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.febrian.vocery.utils.copyText
-import com.febrian.vocery.utils.imageBitmapWithBackground
-import com.febrian.vocery.utils.saveImageToGallery
-import com.febrian.vocery.utils.setAsWallpaper
-import com.febrian.vocery.utils.shareImage
-import com.febrian.vocery.utils.surfaceWithTonalElevation
+import com.febriandev.vocary.utils.copyText
+import com.febriandev.vocary.utils.imageBitmapWithBackground
+import com.febriandev.vocary.utils.saveImageToGallery
+import com.febriandev.vocary.utils.setAsWallpaper
+import com.febriandev.vocary.utils.shareImage
+import com.febriandev.vocary.utils.surfaceWithTonalElevation
 import com.febriandev.vocary.domain.Vocabulary
 import com.febriandev.vocary.ui.vm.VocabularyViewModel
 

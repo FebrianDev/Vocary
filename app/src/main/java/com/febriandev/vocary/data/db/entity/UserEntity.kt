@@ -17,5 +17,6 @@ data class UserEntity(
     val isPremium: Boolean,
     val premiumDuration: Long?, // timestamp expire premium
     val deviceName: String?,
-    val deviceId: String?
+    val deviceId: String?,
+    val isSync: Boolean = false,
 )

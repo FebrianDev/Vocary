@@ -39,16 +39,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.febrian.vocery.utils.downloadAndSaveAudio
-import com.febrian.vocery.utils.playAudioFromFile
-import com.febrian.vocery.utils.speakText
 import com.febriandev.vocary.ui.components.EmptyData
 import com.febriandev.vocary.ui.components.SearchFilter
 import com.febriandev.vocary.ui.components.SortBottomSheet
-import com.febriandev.vocary.ui.favorite.ListFavoriteActivity
+import com.febriandev.vocary.ui.components.TitleTopBar
+import com.febriandev.vocary.ui.favorite.ListVocabularyActivity
 import com.febriandev.vocary.ui.items.ItemVocabularyCard
 import com.febriandev.vocary.ui.shimmer.ItemShimmer
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.utils.downloadAndSaveAudio
+import com.febriandev.vocary.utils.playAudioFromFile
+import com.febriandev.vocary.utils.speakText
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -96,25 +97,9 @@ class HistoryActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(24.dp)
                     ) {
-                        Row(
-                            //modifier = Modifier.padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
 
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
-                                contentDescription = "Back",
-                                modifier = Modifier.clickable {
-                                    finish()
-                                }
-                            )
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Text(
-                                text = "Favorite",
-                                style = MaterialTheme.typography.headlineMedium
-                            )
+                        TitleTopBar("History") {
+                            finish()
                         }
 
                         SearchFilter(
@@ -192,15 +177,16 @@ class HistoryActivity : ComponentActivity() {
 
                                                 }
                                             },
-                                            timestamp = vocabulary.favoriteTimestamp ?: 0L,
+                                            timestamp = vocabulary.historyTimestamp ?: 0L,
                                         ) {
                                             val intent =
                                                 Intent(
                                                     applicationContext,
-                                                    ListHistoryActivity::class.java
+                                                    ListVocabularyActivity::class.java
                                                 )
                                             // intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                             intent.putExtra("position", i)
+                                            intent.putExtra("type", "history")
                                             intent.putExtra("search", searchText)
                                             intent.putExtra("sortType", sortType.name)
                                             intent.putExtra("sortOrder", sortOrder.name)

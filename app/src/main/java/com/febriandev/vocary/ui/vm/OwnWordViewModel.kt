@@ -1,32 +1,25 @@
-package com.febriandev.vocary.ui.favorite
+package com.febriandev.vocary.ui.vm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.febriandev.vocary.data.repository.FavoriteRepository
+import com.febriandev.vocary.data.repository.VocabularyRepository
 import com.febriandev.vocary.domain.Vocabulary
 import com.febriandev.vocary.ui.components.SortOrder
 import com.febriandev.vocary.ui.components.SortType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FavoriteVocabViewModel @Inject constructor(
-    private val repository: FavoriteRepository
-) : ViewModel() {
+class OwnWordViewModel @Inject constructor(private val repository: VocabularyRepository) :
+    ViewModel() {
 
-    private val _favoriteMessage = MutableSharedFlow<String>()
-    val favoriteMessage: SharedFlow<String> = _favoriteMessage
-
-    private val _loadingShimmer = MutableStateFlow(true)
-    val loadingShimmer: StateFlow<Boolean> = _loadingShimmer
+    private val _vocabs = MutableStateFlow<List<Vocabulary>>(emptyList())
+    val vocabs: StateFlow<List<Vocabulary>> = _vocabs
 
     private val _sortType = MutableStateFlow(SortType.DATE)
     val sortType: StateFlow<SortType> get() = _sortType
@@ -43,29 +36,24 @@ class FavoriteVocabViewModel @Inject constructor(
     private var searchJob: Job? = null
     private var loadJob: Job? = null
 
-    private val _vocabs = MutableStateFlow<List<Vocabulary>>(emptyList())
-    val vocabs: StateFlow<List<Vocabulary>> = _vocabs
+    private val _loadingShimmer = MutableStateFlow(true)
+    val loadingShimmer: StateFlow<Boolean> = _loadingShimmer
 
-
-    fun getAllFavoriteWithDetailFlow() {
+    fun getAllOwnWord() {
         loadJob = viewModelScope.launch {
             _loadingShimmer.value = true
-            repository.getAllFavorites().collectLatest {
-                _vocabs.value = sortList(it)
-                delay(300)
-                _loadingShimmer.value = false
-            }
+            _vocabs.value = sortList(repository.getAllOwnWord())
+            delay(300)
+            _loadingShimmer.value = false
         }
     }
 
-    fun searchFavorite(query: String) {
+    fun searchOwnWord(query: String) {
         searchJob = viewModelScope.launch {
             _loadingShimmer.value = true
-            repository.searchFavorite(query).collectLatest {
-                _vocabs.value = sortList(it)
-                delay(300)
-                _loadingShimmer.value = false
-            }
+            _vocabs.value = sortList(repository.searchOwnWord(query))
+            delay(300)
+            _loadingShimmer.value = false
         }
     }
 
@@ -85,9 +73,9 @@ class FavoriteVocabViewModel @Inject constructor(
 
             SortType.DATE -> {
                 if (_sortOrder.value == SortOrder.ASCENDING) {
-                    list.sortedByDescending { it.favoriteTimestamp }
+                    list.sortedByDescending { it.ownWordTimestamp }
                 } else {
-                    list.sortedBy { it.favoriteTimestamp }
+                    list.sortedBy { it.ownWordTimestamp }
                 }
             }
         }

@@ -12,6 +12,7 @@ data class VocabularyEntity(
     @PrimaryKey
     val id: String,
     val word: String,
+    val pronunciation: String? = null,
     val phonetics: List<PhoneticEntity> = emptyList(),
     val definitions: List<UnifiedDefinitionEntity> = emptyList(),
     val sourceUrls: List<String> = emptyList(),
@@ -25,9 +26,14 @@ data class VocabularyEntity(
 
     val isReport: Boolean = false,
 
+    val isOwnWord: Boolean = false,
+    val ownWordTimestamp: Long? = null,
+
     // --- SRS fields ---
     val srsDueDate: Long = System.currentTimeMillis(), // kapan kata ini akan muncul lagi
-    val srsStatus: SrsStatus = SrsStatus.NEW
+    val srsStatus: SrsStatus = SrsStatus.NEW,
+
+    val isSync: Boolean = false,
 )
 
 enum class SrsStatus {
@@ -48,6 +54,8 @@ data class UnifiedDefinitionEntity(
     val partOfSpeech: String?,
     val synonyms: List<String> = emptyList(),
     val examples: List<String> = emptyList(),
+    val derivatives: List<String> = emptyList(),
+    val also: List<String> = emptyList()
 )
 
 fun PhoneticResponse.toEntity(): PhoneticEntity {

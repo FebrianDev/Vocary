@@ -8,8 +8,13 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.febriandev.vocary.utils.Constant.DARK_MODE
+import com.febriandev.vocary.utils.Prefs
+import com.febriandev.vocary.utils.Prefs.set
 
 private val LightColorPalette = lightColorScheme(
     primary = OrangeDeep,
@@ -75,6 +80,8 @@ fun VocaryTheme(
 //        else -> LightColorPalette
 //    }
 
+    val darkTheme by ThemeState.isDarkMode
+
     val colorScheme = if (darkTheme) {
         DarkColorPalette
     } else {
@@ -88,4 +95,9 @@ fun VocaryTheme(
         content = content,
         shapes = Shapes
     )
+}
+
+object ThemeState {
+    // initial dari Prefs
+    var isDarkMode = mutableStateOf(Prefs[DARK_MODE, false])
 }

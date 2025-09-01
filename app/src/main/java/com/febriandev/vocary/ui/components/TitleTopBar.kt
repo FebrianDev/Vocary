@@ -29,14 +29,16 @@ fun TitleTopBar(
             contentDescription = "Back",
             modifier = Modifier.clickable {
                 onBack.invoke()
-            }
+            },
+           tint = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

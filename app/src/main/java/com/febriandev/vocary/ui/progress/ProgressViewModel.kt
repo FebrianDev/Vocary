@@ -2,8 +2,11 @@ package com.febriandev.vocary.ui.progress
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.febriandev.vocary.data.db.entity.DailyProgressEntity
 import com.febriandev.vocary.data.repository.DailyProgressRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -33,21 +36,48 @@ class ProgressViewModel @Inject constructor(
 //        userStreakDao.insertOrUpdate(updated)
 //    }
 
-    fun onVocabularyKnown(target:Int = 10) = viewModelScope.launch {
+    private val _dailyProgress = MutableStateFlow<DailyProgressEntity?>(null)
+    val dailyProgress: StateFlow<DailyProgressEntity?> = _dailyProgress
+
+
+    fun onVocabularyKnown(vocabId: String, target: Int = 10) = viewModelScope.launch {
         val today = todayDate()
         val progress = dailyProgressRepository.getProgress(today)
 
         if (progress != null) {
-            val updatedProgress = progress.copy(
-                progress = progress.progress + 1,
-                isGoalAchieved = (progress.progress + 1) >= target
-            )
-            dailyProgressRepository.update(updatedProgress)
 
-            if (updatedProgress.isGoalAchieved) {
-               // updateGoalStreak(today)
+            val alreadyAdded = progress.listVocabulary.contains(vocabId)
+
+            val updatedProgress = if (!alreadyAdded) {
+                progress.copy(
+                    progress = progress.progress + 1,
+                    isGoalAchieved = (progress.progress + 1) >= target,
+                    listVocabulary = progress.listVocabulary + vocabId, // tambahkan vocab baru
+                    updatedAt = System.currentTimeMillis()
+                )
+            } else {
+                progress
             }
+
+            dailyProgressRepository.update(updatedProgress)
+            getProgress()
+
+        } else {
+            dailyProgressRepository.insert(
+                DailyProgressEntity(
+                    today,
+                    1,
+                    listVocabulary = listOf(vocabId)
+                ),
+            )
+            getProgress()
         }
+    }
+
+    fun getProgress() = viewModelScope.launch {
+        val today = todayDate()
+
+        _dailyProgress.value = dailyProgressRepository.getProgress(today)
     }
 
 //    private suspend fun updateGoalStreak(today: String) {

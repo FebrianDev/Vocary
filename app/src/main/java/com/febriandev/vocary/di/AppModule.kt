@@ -3,6 +3,7 @@ package com.febriandev.vocary.di
 import android.app.Application
 import androidx.room.Room
 import com.febriandev.vocary.data.db.AppDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,8 +43,16 @@ object AppModule {
     @Provides
     @Singleton
     fun provideStreakDao(db: AppDatabase) = db.streakDao()
-    
+
     @Provides
     @Singleton
     fun provideUserDao(db: AppDatabase) = db.userDao()
+
+    @Provides
+    @Singleton
+    fun provideSearchVocabularyDao(db: AppDatabase) = db.searchVocabularyDao()
+
+    @Provides
+    @Singleton
+    fun provideFirestore() = FirebaseFirestore.getInstance()
 }

@@ -16,4 +16,9 @@ object Constant {
     const val GREETING = "GREETING"
     const val MOTIVATION = "MOTIVATION"
     const val NOTIFICATION = "NOTIFICATION"
+    const val DARK_MODE = "DARK_MODE"
+
+    //STREAK TYPE
+    const val DAILY_GOAL = "DAILY_GOAL"
+    const val OPEN_APP = "OPEN_APP"
 }

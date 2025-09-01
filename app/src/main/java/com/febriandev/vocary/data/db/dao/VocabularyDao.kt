@@ -16,6 +16,9 @@ interface VocabularyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVocabulary(vocabulary: List<VocabularyEntity>)
 
+    @Query("SELECT * FROM vocabulary WHERE word = :word LIMIT 1")
+    suspend fun getVocabularyByWord(word: String): VocabularyEntity?
+
     @Query(
         """
     SELECT DISTINCT * 
@@ -105,4 +108,22 @@ interface VocabularyDao {
 
     @Query("UPDATE vocabulary SET isHistory = 1, historyTimestamp = :timestamp WHERE id = :id")
     suspend fun addToHistory(id: String, timestamp: Long = System.currentTimeMillis())
+
+    @Query("""
+    SELECT DISTINCT * 
+    FROM vocabulary 
+    WHERE isOwnWord = 1
+    ORDER BY id DESC
+""")
+    suspend fun getAllOwnWord(): List<VocabularyEntity>
+
+    @Query("""
+    SELECT DISTINCT * 
+    FROM vocabulary
+    WHERE word LIKE '%' || :query || '%' 
+      AND isOwnWord = 1 
+
+    ORDER BY id DESC
+""")
+    suspend fun searchOwnWord(query: String): List<VocabularyEntity>
 }

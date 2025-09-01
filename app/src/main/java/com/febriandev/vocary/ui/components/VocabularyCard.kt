@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.febriandev.vocary.data.db.entity.SrsStatus
 
 @Composable
@@ -40,9 +41,9 @@ fun VocabularyCard(
     isFavorite: Boolean,
     srsStatus: SrsStatus,
     shouldCaptureScreenshot: Boolean,
+    active: Boolean = true,
     onPlayPronunciationClick: () -> Unit,
     onInfoClick: () -> Unit,
-    onTranslate: () -> Unit,
     onShareClick: () -> Unit,
     onNotes: () -> Unit,
     onFavoriteClick: () -> Unit,
@@ -71,8 +72,8 @@ fun VocabularyCard(
                 // Word & Favorite
                 Text(
                     text = word,
-                    style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Bold),
-                    color = primary,
+                    style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Bold, fontSize = if(word.length > 10) 36.sp else 42.sp),
+                    color = primary
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -193,7 +194,10 @@ fun VocabularyCard(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (!shouldCaptureScreenshot)
-            VocabularyAnswerSection(srsStatus, onAnswerClick)
+        if (!shouldCaptureScreenshot) {
+            if(active) {
+                VocabularyAnswerSection(srsStatus, onAnswerClick)
+            }
+        }
     }
 }

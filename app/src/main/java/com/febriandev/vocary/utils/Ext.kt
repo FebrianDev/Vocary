@@ -1,6 +1,6 @@
-package com.febrian.vocery.utils
+package com.febriandev.vocary.utils
 
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.app.WallpaperManager
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -15,6 +15,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
@@ -36,8 +37,43 @@ import java.io.IOException
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Locale
 import java.util.UUID
 import kotlin.math.ln
+
+
+@SuppressLint("HardwareIds")
+fun getAppId(context: Context): String {
+    var androidId =
+        Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+    if (androidId == null) androidId = ""
+    return androidId + "-" + UUID.randomUUID().toString()
+}
+
+fun getDeviceName(): String {
+    val manufacturer = Build.MANUFACTURER
+    val model = Build.MODEL
+    return if (model.lowercase(Locale.getDefault())
+            .startsWith(manufacturer.lowercase(Locale.getDefault()))
+    ) {
+        capitalize(model)
+    } else {
+        capitalize(manufacturer) + " " + model
+    }
+}
+
+private fun capitalize(s: String?): String {
+    if (s.isNullOrEmpty()) {
+        return ""
+    }
+    val first = s[0]
+    return if (Character.isUpperCase(first)) {
+        s
+    } else {
+        first.uppercaseChar().toString() + s.substring(1)
+    }
+}
+
 
 suspend fun downloadAndSaveAudio(context: Context, url: String, fileName: String): File {
     val file = File(context.filesDir, fileName)
@@ -132,8 +168,7 @@ fun shareImage(context: Context, bitmap: Bitmap) {
         file
     )
 
-    val shareIntent = Intent().apply {
-        action = Intent.ACTION_SEND
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
         putExtra(Intent.EXTRA_STREAM, uri)
         type = "image/png"
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

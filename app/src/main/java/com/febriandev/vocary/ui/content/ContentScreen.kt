@@ -20,13 +20,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.composables.icons.lucide.GraduationCap
+import com.composables.icons.lucide.Lucide
 import com.febriandev.vocary.ui.components.CardButton
 import com.febriandev.vocary.ui.components.CustomAnimatedModalSheet
 import com.febriandev.vocary.ui.favorite.FavoriteActivity
 import com.febriandev.vocary.ui.history.HistoryActivity
+import com.febriandev.vocary.ui.minigame.MiniGameActivity
+import com.febriandev.vocary.ui.search.MyOwnWordActivity
+import com.febriandev.vocary.ui.search.SearchVocabularyActivity
 
 @Composable
-fun ContentScreen(showContent: Boolean, context: Context, onDismiss: () -> Unit) {
+fun ContentScreen(
+    isPremium: Boolean,
+    showContent: Boolean,
+    context: Context,
+    onDismiss: () -> Unit
+) {
     CustomAnimatedModalSheet(
         show = showContent,
         onDismiss = onDismiss
@@ -35,7 +45,11 @@ fun ContentScreen(showContent: Boolean, context: Context, onDismiss: () -> Unit)
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Text(text = "Explore Content", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                text = "Explore Content",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
             Spacer(Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -64,33 +78,57 @@ fun ContentScreen(showContent: Boolean, context: Context, onDismiss: () -> Unit)
                     }
                 )
             }
+
             Spacer(modifier = Modifier.height(12.dp))
+
             CardButton(
                 modifier = Modifier.fillMaxWidth(),
                 icon = Icons.Default.Search,
                 text = "Search Vocabulary",
+                isPremium = isPremium,
                 onClick = {
-//                    val intent = Intent(context.applicationContext,SearchVocabularyActivity::class.java)
-//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                    context.startActivity(intent)
+                    val intent =
+                        Intent(context.applicationContext, SearchVocabularyActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(intent)
                 }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
+
             CardButton(
                 modifier = Modifier.fillMaxWidth(),
                 icon = Icons.Default.EditNote,
                 text = "My Own Word",
+                isPremium = isPremium,
                 onClick = {
-//                    val intent = Intent(context.applicationContext, MyOwnWordActivity::class.java)
-//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                    context.startActivity(intent)
+                    val intent = Intent(context.applicationContext, MyOwnWordActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(intent)
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            CardButton(
+                modifier = Modifier.fillMaxWidth(),
+                icon = Lucide.GraduationCap,
+                text = "Practice",
+                isPremium = isPremium,
+                onClick = {
+                    val intent = Intent(context.applicationContext, MiniGameActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(intent)
                 }
             )
 
             Spacer(Modifier.height(24.dp))
 
-            Text(text = "Explore Topic", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                text = "Explore Topic",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
 
             Spacer(Modifier.height(16.dp))
 
@@ -98,21 +136,25 @@ fun ContentScreen(showContent: Boolean, context: Context, onDismiss: () -> Unit)
                 modifier = Modifier.fillMaxWidth(),
                 icon = Icons.Default.ArrowUpward,
                 text = "Change Level",
+                isPremium = isPremium,
                 onClick = {
-//                    val intent = Intent(context.applicationContext, ChangeLevelActivity::class.java)
-//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                    context.startActivity(intent)
+                    val intent = Intent(context.applicationContext, ChangeLevelActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(intent)
                 }
             )
+
             Spacer(Modifier.height(12.dp))
+
             CardButton(
                 modifier = Modifier.fillMaxWidth(),
                 icon = Icons.Default.Topic,
                 text = "Change Topic",
+                isPremium = isPremium,
                 onClick = {
-//                    val intent = Intent(context.applicationContext, ChangeTopicActivity::class.java)
-//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                    context.startActivity(intent)
+                    val intent = Intent(context.applicationContext, ChangeTopicActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(intent)
                 }
             )
         }

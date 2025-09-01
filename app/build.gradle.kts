@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.gms.google.services)
+
+    id("kotlin-parcelize")
 }
 
 android {
@@ -159,6 +161,12 @@ android {
         composeOptions {
             kotlinCompilerExtensionVersion = "1.5.1"
         }
+
+//        configurations.all {
+//            resolutionStrategy {
+//                force("com.google.guava:guava:31.1-android")
+//            }
+//        }
     }
 
     dependencies {
@@ -178,6 +186,7 @@ android {
 
         //extended-icons
         implementation(libs.androidx.material.icons.extended)
+        implementation("com.composables:icons-lucide:1.0.0")
 
         //pager
         implementation(libs.accompanist.pager)
@@ -215,11 +224,25 @@ android {
 
         implementation("com.google.android.gms:play-services-auth:20.7.0")
 
+        //lottie
+        implementation("com.airbnb.android:lottie-compose:6.1.0")
+
+//        // Fix ListenableFuture conflict
+//        implementation("androidx.concurrent:concurrent-futures:1.1.0")
+//        implementation("com.google.guava:guava:31.1-android") {
+//            exclude(group = "com.google.guava", module = "listenablefuture")
+//        }
+
     }
 }
-dependencies {
+
+dependencies{
+    //firebase
     implementation(libs.firebase.auth)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
+    //implementation(libs.googleid)
+    implementation("com.google.guava:guava:32.1.3-android")
+    implementation(libs.firebase.firestore.ktx)
 }
+

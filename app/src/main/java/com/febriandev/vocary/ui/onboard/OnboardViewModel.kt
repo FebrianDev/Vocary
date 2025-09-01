@@ -28,7 +28,6 @@ class OnboardViewModel @Inject constructor() : ViewModel() {
 
     fun nextStep() {
         _formStep.value = when (_formStep.value) {
-            FormStep.AUTH -> FormStep.NAME
             FormStep.NAME -> FormStep.OLD
             FormStep.OLD -> FormStep.GENDER
             FormStep.GENDER -> FormStep.WORD
@@ -48,8 +47,7 @@ class OnboardViewModel @Inject constructor() : ViewModel() {
             FormStep.WORD -> FormStep.GENDER
             FormStep.GENDER -> FormStep.OLD
             FormStep.OLD -> FormStep.NAME
-            FormStep.NAME -> FormStep.AUTH
-            FormStep.AUTH -> TODO()
+            FormStep.NAME -> TODO()
         }
     }
 

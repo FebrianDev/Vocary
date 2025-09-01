@@ -12,5 +12,6 @@ data class GameSessionEntity(
     val totalQuestions: Int,
     val correctAnswers: Int,
     val wrongAnswers: Int,
-    val score: Int
+    val score: Int,
+    val isSync: Boolean = false,
 )

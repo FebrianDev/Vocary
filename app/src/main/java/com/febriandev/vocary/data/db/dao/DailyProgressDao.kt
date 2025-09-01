@@ -17,4 +17,5 @@ interface DailyProgressDao {
 
     @Update
     suspend fun update(progress: DailyProgressEntity)
+
 }

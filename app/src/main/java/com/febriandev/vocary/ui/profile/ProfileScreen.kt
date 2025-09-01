@@ -14,15 +14,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DriveFileRenameOutline
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -34,10 +37,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.febriandev.vocary.MainActivity
 import com.febriandev.vocary.ui.auth.AuthActivity
 import com.febriandev.vocary.ui.components.CustomAnimatedModalSheet
+import com.febriandev.vocary.ui.theme.ThemeState
+import com.febriandev.vocary.utils.Constant.DARK_MODE
 import com.febriandev.vocary.utils.Constant.NOTIFICATION
 import com.febriandev.vocary.utils.Prefs
 import kotlinx.coroutines.CoroutineScope
@@ -49,8 +54,6 @@ fun ProfileScreen(
     showProfile: Boolean,
     scope: CoroutineScope,
     context: Context,
-    onGreeting: (greeting: Boolean) -> Unit,
-    onMotivation: (motivation: Boolean) -> Unit,
     onDeleteData: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -68,7 +71,11 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Text(text = "Setting", style = MaterialTheme.typography.headlineMedium)
+            Text(
+                text = "Setting",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
             Spacer(Modifier.height(16.dp))
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -78,152 +85,55 @@ fun ProfileScreen(
             ) {
 
                 Column {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                    SettingsRow(
+                        icon = Icons.Default.Person,
+                        title = "Profile",
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        onClick = { }
+                    )
 
-                        Row {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Greeting",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Greeting",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
+                    SettingsRow(
+                        icon = Icons.Default.Brightness4,
+                        title = "Dark Mode",
+                        switchChecked = ThemeState.isDarkMode.value,
+                        onSwitchChange = {
+                            ThemeState.isDarkMode.value = it   // trigger recompose
+                            Prefs[DARK_MODE] = it
                         }
+                    )
 
-//                        Switch(
-//                            checked = isGreeting,
-//                            onCheckedChange = {
-//                                Prefs[GREETING] = it
-//                                onGreeting(it)
-//                            }
-//                        )
-                    }
-
-                    Divider()
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-
-                        Row {
-                            Icon(
-                                imageVector = Icons.Default.DriveFileRenameOutline,
-                                contentDescription = "Motivation",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Motivation",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
+                    SettingsRow(
+                        icon = Icons.Default.Notifications,
+                        title = "Notification",
+                        switchChecked = isCheckedNotification,
+                        onSwitchChange = {
+                            isCheckedNotification = it
+                            Prefs[NOTIFICATION] = it
                         }
+                    )
 
-//                        Switch(
-//                            checked = isMotivation,
-//                            onCheckedChange = {
-//                                Prefs[MOTIVATION] = it
-//                                onMotivation(it)
-//                            }
-//                        )
-                    }
+                    SettingsRow(
+                        icon = Icons.Default.Settings,
+                        title = "Sync Data to Server",
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        onClick = { }
+                    )
 
-                    Divider()
+                    SettingsRow(
+                        icon = Icons.Default.Info,
+                        title = "About",
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        onClick = { isAbout = true }
+                    )
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notification",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Notification",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-
-                        Switch(
-                            checked = isCheckedNotification,
-                            onCheckedChange = {
-                                isCheckedNotification = it
-                                Prefs[NOTIFICATION] = it
-                            }
-                        )
-
-                    }
-
-                    Divider()
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 16.dp)
-                            .clickable {
-                                isAbout = true
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "Info",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "About",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-
-                    }
-
-                    Divider()
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 16.dp)
-                            .clickable {
-                                isLogout = true
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Logout,
-                            contentDescription = "Logout",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Logout",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-
-                    }
+                    SettingsRow(
+                        icon = Icons.AutoMirrored.Filled.Logout,
+                        title = "Logout",
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        onClick = { isLogout = true }
+                    )
                 }
+
             }
         }
     }
@@ -287,4 +197,82 @@ fun ProfileScreen(
 //        }
     }
 
+}
+
+
+@Composable
+fun SettingsRow(
+    icon: ImageVector,
+    title: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = "Arrow Right",
+        )
+    }
+    HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
+}
+
+@Composable
+fun SettingsRow(
+    icon: ImageVector,
+    title: String,
+    modifier: Modifier = Modifier,
+    switchChecked: Boolean? = null,
+    onSwitchChange: ((Boolean) -> Unit)? = null,
+    onClick: (() -> Unit)? = null
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        switchChecked?.let { checked ->
+            onSwitchChange?.let { onChange ->
+                Switch(checked = checked, onCheckedChange = onChange)
+            }
+        }
+    }
+    HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
 }

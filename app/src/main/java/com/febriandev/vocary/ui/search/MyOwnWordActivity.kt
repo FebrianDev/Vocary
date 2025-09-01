@@ -1,10 +1,9 @@
-package com.febriandev.vocary.ui.favorite
+package com.febriandev.vocary.ui.search
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -29,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,27 +37,23 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.febriandev.vocary.utils.downloadAndSaveAudio
-import com.febriandev.vocary.utils.playAudioFromFile
-import com.febriandev.vocary.utils.speakText
 import com.febriandev.vocary.ui.components.EmptyData
 import com.febriandev.vocary.ui.components.SearchFilter
 import com.febriandev.vocary.ui.components.SortBottomSheet
 import com.febriandev.vocary.ui.components.TitleTopBar
+import com.febriandev.vocary.ui.favorite.ListVocabularyActivity
 import com.febriandev.vocary.ui.items.ItemVocabularyCard
 import com.febriandev.vocary.ui.shimmer.ItemShimmer
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.OwnWordViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
 
 @AndroidEntryPoint
-class FavoriteActivity : ComponentActivity() {
+class MyOwnWordActivity : ComponentActivity() {
 
-    private val vocabFavoriteViewModel: FavoriteVocabViewModel by viewModels()
+    private val ownWordViewModel: OwnWordViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -76,30 +70,31 @@ class FavoriteActivity : ComponentActivity() {
 
                     var searchText by remember { mutableStateOf("") }
                     var showSortSheet by remember { mutableStateOf(false) }
-                    val sortType by vocabFavoriteViewModel.sortType.collectAsState()
-                    val sortOrder by vocabFavoriteViewModel.sortOrder.collectAsState()
 
-                    val loadingShimmer by vocabFavoriteViewModel.loadingShimmer.collectAsState()
+                    val sortType by ownWordViewModel.sortType.collectAsState()
+                    val sortOrder by ownWordViewModel.sortOrder.collectAsState()
+
+                    val loadingShimmer by ownWordViewModel.loadingShimmer.collectAsState()
 
                     LaunchedEffect(searchText) {
                         if (searchText.isBlank()) {
-                            vocabFavoriteViewModel.getAllFavoriteWithDetailFlow()
+                            ownWordViewModel.getAllOwnWord()
                         } else {
                             delay(300)
-                            vocabFavoriteViewModel.searchFavorite(searchText)
+                            ownWordViewModel.searchOwnWord(searchText)
                         }
                     }
 
-                    val favorite by vocabFavoriteViewModel.vocabs.collectAsState()
+                    val ownWord by ownWordViewModel.vocabs.collectAsState()
                     val coroutineScope = rememberCoroutineScope()
 
                     Column(
-                        modifier = Modifier.padding(innerPadding)
-                        .fillMaxSize()
-                        .padding(24.dp)
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                            .padding(24.dp)
                     ) {
-
-                        TitleTopBar("Favorite") {
+                        TitleTopBar("My Own Word") {
                             finish()
                         }
 
@@ -114,6 +109,7 @@ class FavoriteActivity : ComponentActivity() {
 
                         LazyColumn(
                             modifier = Modifier
+                            // .padding(8.dp)
                         ) {
 
                             if (loadingShimmer) {
@@ -121,64 +117,41 @@ class FavoriteActivity : ComponentActivity() {
                                     ItemShimmer()
                                 }
                             } else {
-                                if (favorite.isEmpty()) {
+                                if (ownWord.isEmpty()) {
                                     item {
                                         Box(Modifier.fillParentMaxHeight(0.8f)) {
                                             EmptyData()
                                         }
                                     }
                                 } else {
-                                    itemsIndexed(favorite) { i, vocabulary ->
+                                    itemsIndexed(ownWord) { i, it ->
 
-                                        val audioUrl =
-                                            vocabulary.audio
-
-                                        LaunchedEffect(audioUrl) {
-                                            if (audioUrl.isEmpty()) return@LaunchedEffect
-                                            try {
-                                                val fileName = "${vocabulary.word}.mp3"
-                                                downloadAndSaveAudio(
-                                                    applicationContext,
-                                                    audioUrl,
-                                                    fileName
-                                                )
-                                            } catch (e: Exception) {
-                                                Log.e(
-                                                    "AudioDownload",
-                                                    "Failed to download audio: ${e.localizedMessage}"
-                                                )
-                                            }
-                                        }
+                                        //       val vocab = it.toVocabularyEntity()
+                                        val meanings = it.definitions.firstOrNull()
 
                                         ItemVocabularyCard(
-                                            word = vocabulary.word,
-                                            phonetic = vocabulary.phonetic,
-                                            definition = vocabulary.definition,
+                                            word = it.word,
+                                            phonetic = it.phonetic,
+                                            definition = "(${meanings?.partOfSpeech}) ${meanings?.definition}",
                                             onPlayPronunciationClick = {
-                                                coroutineScope.launch {
-                                                    try {
-                                                        if (audioUrl.isEmpty()) {
-                                                            speakText(vocabulary.word)
-                                                        } else {
-                                                            val fileName = "${vocabulary.word}.mp3"
-                                                            val file = downloadAndSaveAudio(
-                                                                applicationContext,
-                                                                audioUrl,
-                                                                fileName
-                                                            )
-                                                            playAudioFromFile(file)
-                                                        }
-                                                    } catch (e: Exception) {
-                                                        Log.e(
-                                                            "PlayAudio",
-                                                            "Error while playing pronunciation: ${e.localizedMessage}"
-                                                        )
-                                                        speakText(vocabulary.word) // fallback ke TTS Android
-                                                    }
-
-                                                }
+//                                                coroutineScope.launch {
+//                                                    val audioUrl =
+//                                                        vocab.phonetics.firstOrNull { it.audio?.isNotBlank() == true }?.audio
+//
+//                                                    if (audioUrl.isNullOrEmpty()) {
+//                                                        speakText(vocab.word)
+//                                                    } else {
+//                                                        val fileName = "${it.word}.mp3"
+//                                                        val file = downloadAndSaveAudio(
+//                                                            applicationContext,
+//                                                            audioUrl,
+//                                                            fileName
+//                                                        )
+//                                                        playAudioFromFile(file)
+//                                                    }
+//                                                }
                                             },
-                                            timestamp = vocabulary.favoriteTimestamp ?: 0L,
+                                            timestamp = it.ownWordTimestamp ?: 0L,
                                         ) {
                                             val intent =
                                                 Intent(
@@ -187,7 +160,7 @@ class FavoriteActivity : ComponentActivity() {
                                                 )
                                             // intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                             intent.putExtra("position", i)
-                                            intent.putExtra("type", "favorite")
+                                            intent.putExtra("type", "ownWord")
                                             intent.putExtra("search", searchText)
                                             intent.putExtra("sortType", sortType.name)
                                             intent.putExtra("sortOrder", sortOrder.name)
@@ -204,13 +177,12 @@ class FavoriteActivity : ComponentActivity() {
                             sortType = sortType,
                             sortOrder = sortOrder,
                             onSortChange = { type, order ->
-                                vocabFavoriteViewModel.updateSort(type, order)
+                                ownWordViewModel.updateSort(type, order)
                                 showSortSheet = false
                             },
                             onDismiss = { showSortSheet = false }
                         )
                     }
-
                 }
             }
         }

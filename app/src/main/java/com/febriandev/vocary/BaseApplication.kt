@@ -3,6 +3,8 @@ package com.febriandev.vocary
 import android.app.Application
 import android.util.Log
 import androidx.work.Configuration
+import com.febriandev.vocary.ui.theme.ThemeState
+import com.febriandev.vocary.utils.Constant.DARK_MODE
 import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.worker.WorkFactory
 import dagger.hilt.android.HiltAndroidApp
@@ -17,6 +19,7 @@ class BaseApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         Prefs.init(this)
+        ThemeState.isDarkMode.value = Prefs[DARK_MODE, false]
     }
 
     override fun onTrimMemory(level: Int) {

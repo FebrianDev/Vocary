@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.febriandev.vocary.data.db.entity.UserEntity
 import com.febriandev.vocary.data.repository.UserRepository
-import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,21 +16,23 @@ class UserViewModel @Inject constructor(private val repository: UserRepository) 
     private val _user = MutableStateFlow<UserEntity?>(null)
     val user: StateFlow<UserEntity?> = _user
 
-    fun loadUser(id: String) {
-        viewModelScope.launch {
-            _user.value = repository.getUserById(id)
-        }
+    private val _insertResult = MutableStateFlow(false)
+    val insertResult: StateFlow<Boolean> = _insertResult
+
+    suspend fun getCurrentUser(): UserEntity? {
+        return repository.getCurrentUser()
     }
 
-    fun loadCurrentUser() {
-        viewModelScope.launch {
-            _user.value = repository.getCurrentUser()
-        }
+    fun getUser() = viewModelScope.launch {
+        _user.value = repository.getCurrentUser()
     }
 
     fun saveUser(user: UserEntity) {
         viewModelScope.launch {
             repository.insertOrUpdateUser(user)
+            repository.insertUser(user) { success, _ ->
+                _insertResult.value = success
+            }
             _user.value = user
         }
     }

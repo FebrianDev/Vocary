@@ -42,10 +42,6 @@ class ListHistoryActivity : ComponentActivity() {
 
     private val historyViewModel: HistoryViewModel by viewModels()
     private val vocabularyViewModel: VocabularyViewModel by viewModels()
-//    private val translationViewModel: TranslationViewModel by viewModels()
-//    private val helper by lazy {
-//        TranslationHelper(application.applicationContext)
-//    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -126,17 +122,19 @@ class ListHistoryActivity : ComponentActivity() {
                             }
 
                             VocabularyVerticalPager(
-                                vocabs,
-                                shouldCaptureScreenshot, onNoteCLick = {
+                                vocabs = vocabs,
+                                shouldCaptureScreenshot = shouldCaptureScreenshot, onNoteCLick = {
                                     showNote = true
                                 },
                                 onShareClick = {
                                     shouldCaptureScreenshot = true
                                 },
-                                onProgress = {},
-                                pagerState,
-                                applicationContext,
-                                vocabularyViewModel
+                                onProgress = {
+
+                                },
+                                pagerState = pagerState,
+                                applicationContext = applicationContext,
+                                vocabViewModel = vocabularyViewModel
                             )
                         }
 

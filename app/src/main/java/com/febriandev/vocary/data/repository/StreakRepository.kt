@@ -1,7 +1,12 @@
 package com.febriandev.vocary.data.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.febriandev.vocary.data.db.dao.StreakDao
+import com.febriandev.vocary.data.db.entity.StreakDay
 import com.febriandev.vocary.data.db.entity.StreakEntity
+import com.febriandev.vocary.data.db.entity.mapToStreakDay
+import com.febriandev.vocary.data.db.entity.mapToStreakDays
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -16,14 +21,18 @@ class StreakRepository @Inject constructor(private val streakDao: StreakDao) {
         streakDao.insertStreaks(streaks)
     }
 
-    suspend fun getStreaksByType(streakType: String): List<StreakEntity> =
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getStreaksByType(streakType: String): List<StreakDay> =
         withContext(Dispatchers.IO) {
-            streakDao.getStreaksByType(streakType)
+            mapToStreakDays(streakDao.getStreaksByType(streakType))
         }
 
-    suspend fun getStreakByDate(streakType: String, date: String): StreakEntity? =
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getStreakByDate(streakType: String, date: String): StreakDay? =
         withContext(Dispatchers.IO) {
-            streakDao.getStreakByDate(streakType, date)
+            val streak = streakDao.getStreakByDate(streakType, date)
+            if (streak == null) null
+            else mapToStreakDay(streak)
         }
 
     suspend fun clearStreakByType(streakType: String) = withContext(Dispatchers.IO) {

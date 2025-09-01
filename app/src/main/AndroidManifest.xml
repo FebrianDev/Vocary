@@ -26,30 +26,6 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Vocary">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
-
-        <activity
-            android:name=".ui.onboard.OnboardActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Vocary">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
-
-        <activity
-            android:name=".ui.auth.AuthActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Vocary">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -58,34 +34,106 @@
         </activity>
 
         <activity
+            android:name=".ui.SplashActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary">
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            </intent-filter>-->
+        </activity>
+
+        <activity
+            android:name=".ui.onboard.OnboardActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary">
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            </intent-filter>-->
+        </activity>
+
+        <activity
+            android:name=".ui.auth.AuthActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary">
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            </intent-filter>-->
+        </activity>
+
+        <activity
+            android:name=".ui.auth.RegisterActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary" />
+
+        <activity
+            android:name=".ui.onboard.LoadingActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary" />
+
+        <activity
             android:name=".ui.minigame.MiniGameActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Vocary"/>
+            android:theme="@style/Theme.Vocary" />
 
         <activity
             android:name=".ui.favorite.FavoriteActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Vocary"/>
+            android:theme="@style/Theme.Vocary" />
 
         <activity
-            android:name=".ui.favorite.ListFavoriteActivity"
+            android:name=".ui.favorite.ListVocabularyActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Vocary"/>
+            android:theme="@style/Theme.Vocary" />
 
         <activity
             android:name=".ui.history.HistoryActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Vocary"/>
+            android:theme="@style/Theme.Vocary" />
 
         <activity
             android:name=".ui.history.ListHistoryActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Vocary"/>
+            android:theme="@style/Theme.Vocary" />
+
+        <activity
+            android:name=".ui.search.SearchVocabularyActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary" />
+
+        <activity
+            android:name=".ui.search.MyOwnWordActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary" />
+
+        <activity
+            android:name=".ui.content.ChangeLevelActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary" />
+
+        <activity
+            android:name=".ui.content.ChangeTopicActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

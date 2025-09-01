@@ -2,6 +2,7 @@ package com.febriandev.vocary.data.repository
 
 import com.febriandev.vocary.data.db.dao.VocabularyDao
 import com.febriandev.vocary.data.db.entity.SrsStatus
+import com.febriandev.vocary.data.db.entity.VocabularyEntity
 import com.febriandev.vocary.domain.Vocabulary
 import com.febriandev.vocary.domain.toVocabulary
 import kotlinx.coroutines.flow.Flow
@@ -9,8 +10,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class VocabularyRepository @Inject constructor(private val vocabularyDao: VocabularyDao) {
-    suspend fun getAllVocabulary(currentTime:Long): List<Vocabulary> {
-        return vocabularyDao.getAllVocabulary(currentTime).map { it.toVocabulary() }
+    suspend fun getAllVocabulary(currentTime: Long): List<Vocabulary> {
+        return vocabularyDao.getAllVocabulary(currentTime).map { it.toVocabulary() }.shuffled()
     }
 
     // suspend fun getFavorites(): List<VocabularyEntity> = vocabularyDao.getFavorites()
@@ -51,4 +52,21 @@ class VocabularyRepository @Inject constructor(private val vocabularyDao: Vocabu
     suspend fun addToHistory(id: String) {
         vocabularyDao.addToHistory(id, System.currentTimeMillis())
     }
+
+    suspend fun getAllOwnWord(): List<Vocabulary> {
+        return vocabularyDao.getAllOwnWord().map { it.toVocabulary() }
+    }
+
+    suspend fun searchOwnWord(query: String): List<Vocabulary> {
+        return vocabularyDao.searchOwnWord(query).map { it.toVocabulary() }
+    }
+
+    suspend fun insertVocabulary(vocabulary: VocabularyEntity) {
+        vocabularyDao.insertVocabulary(vocabulary)
+    }
+
+    suspend fun getVocabularyByWord(word: String): VocabularyEntity? {
+        return vocabularyDao.getVocabularyByWord(word)
+    }
+
 }

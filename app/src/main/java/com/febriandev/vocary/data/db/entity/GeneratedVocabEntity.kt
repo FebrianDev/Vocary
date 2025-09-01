@@ -10,6 +10,7 @@ data class GeneratedVocabEntity(
     val id:Int = 0,
     val word: String = "",
     val isStatus: Boolean = false,
+    val isSync: Boolean = false,
 )
 
 fun convertToVocabListFromArray(json: String): List<GeneratedVocabEntity> {

@@ -3,10 +3,10 @@ package com.febriandev.vocary.data.response
 data class DictionaryResponse(
     val word: String,
     val phonetic: String?,
-    val phonetics: List<PhoneticResponse>,
-    val meanings: List<MeaningResponse>,
+    val phonetics: List<PhoneticResponse>?,
+    val meanings: List<MeaningResponse>?,
     val license: LicenseResponse?,
-    val sourceUrls: List<String>
+    val sourceUrls: List<String>?
 )
 
 data class PhoneticResponse(
@@ -17,20 +17,20 @@ data class PhoneticResponse(
 )
 
 data class MeaningResponse(
-    val partOfSpeech: String,
-    val definitions: List<DefinitionResponse>,
-    val synonyms: List<String>,
-    val antonyms: List<String>
+    val partOfSpeech: String?,
+    val definitions: List<DefinitionResponse>?,
+    val synonyms: List<String>?,
+    val antonyms: List<String>?
 )
 
 data class DefinitionResponse(
-    val definition: String,
+    val definition: String?,
     val example: String? = null,
-    val synonyms: List<String>,
-    val antonyms: List<String>
+    val synonyms: List<String>?,
+    val antonyms: List<String>?
 )
 
 data class LicenseResponse(
-    val name: String,
-    val url: String
+    val name: String?,
+    val url: String?
 )

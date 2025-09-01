@@ -48,7 +48,8 @@ fun FormOptionField(
     ) {
         Text(
             text = option,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
         if (isSelected) {
             Icon(

@@ -53,9 +53,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.getValue
+import kotlin.toString
 
 @AndroidEntryPoint
-class AuthActivity : BaseActivity() {
+class RegisterActivity : BaseActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
 
@@ -112,8 +114,6 @@ class AuthActivity : BaseActivity() {
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    // Spacer(modifier = Modifier.height(24.dp))
-
                     Image(
                         painter = painterResource(R.drawable.icon_image2),
                         contentDescription = "",
@@ -138,18 +138,18 @@ class AuthActivity : BaseActivity() {
 
                     Button(
                         onClick = {
-                            authViewModel.signInWithEmail(email, password)
+                            authViewModel.registerWithEmail(email, password)
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Login")
+                        Text("Register")
                     }
 
                     TextButton(onClick = {
-                        val intent = Intent(applicationContext, RegisterActivity::class.java)
+                        val intent = Intent(applicationContext, AuthActivity::class.java)
                         startActivity(intent)
                     }) {
-                        Text("Don't have an account? Register")
+                        Text("Already have an account? Login")
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -163,7 +163,9 @@ class AuthActivity : BaseActivity() {
                             authViewModel.signInWithGoogle(idToken)
                         }
                     )
+
                     Spacer(modifier = Modifier.height(6.dp))
+
                     Button(
                         onClick = {
                             val intent = Intent(applicationContext, OnboardActivity::class.java)

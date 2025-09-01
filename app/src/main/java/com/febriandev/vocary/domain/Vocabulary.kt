@@ -7,12 +7,13 @@ import com.febriandev.vocary.data.db.entity.VocabularyEntity
 data class Vocabulary(
     val id: String = "",
     val word: String = "",
-    val phonetic: String = "",              // dari phonetics[0].text
-    val audio: String = "",                 // dari phonetics[0].audio
-    val sourceUrl: String = "",             // dari phonetics[0].sourceUrl
-    val definition: String = "",            // dari definitions[0].definition
-    val partOfSpeech: String = "",          // dari definitions[0].partOfSpeech
+    val phonetic: String = "",
+    val audio: String = "",
+    val sourceUrl: String = "",
+    val definition: String = "",
+    val partOfSpeech: String = "",
     val synonyms: List<String> = emptyList(),
+    val antonyms: List<String> = emptyList(),
     val examples: List<String> = emptyList(),
     val definitions: List<UnifiedDefinitionEntity> = emptyList(),
 
@@ -21,6 +22,9 @@ data class Vocabulary(
     // --- SRS fields ---
     val srsDueDate: Long = System.currentTimeMillis(), // kapan kata ini akan muncul lagi
     val srsStatus: SrsStatus = SrsStatus.NEW,
+
+    val isOwnWord: Boolean = false,
+    val ownWordTimestamp: Long? = null,
 
     val isReport: Boolean = false,
 
@@ -39,7 +43,7 @@ fun VocabularyEntity.toVocabulary(): Vocabulary {
     return Vocabulary(
         id = this.id,
         word = this.word,
-        phonetic = firstPhonetic ?: "",
+        phonetic = this.pronunciation ?: firstPhonetic ?: "",
         audio = firstAudio ?: "",
         sourceUrl = firstUrl ?: "",
         definition = firstDefinition?.definition ?: "",
@@ -52,6 +56,9 @@ fun VocabularyEntity.toVocabulary(): Vocabulary {
 
         srsDueDate = srsDueDate,
         srsStatus = srsStatus,
+
+        isOwnWord = isOwnWord,
+        ownWordTimestamp = ownWordTimestamp ?: 0L,
 
         isReport = isReport,
 

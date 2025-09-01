@@ -7,19 +7,26 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,7 +34,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.febriandev.vocary.data.db.entity.toVocabularyEntity
+import com.febriandev.vocary.ui.components.EmptyData
+import com.febriandev.vocary.ui.components.SearchNoFilter
+import com.febriandev.vocary.ui.components.TitleTopBar
+import com.febriandev.vocary.ui.items.ItemSearchVocabulary
+import com.febriandev.vocary.ui.shimmer.ItemShimmer
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.VocabularyViewModel
+import com.febriandev.vocary.utils.showMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 
@@ -35,7 +50,7 @@ import kotlinx.coroutines.delay
 class SearchVocabularyActivity : ComponentActivity() {
 
     private val searchVocabularyViewModel: SearchVocabularyViewModel by viewModels()
- //   private val vocabViewModel: VocabViewModel by viewModels()
+    private val vocabViewModel: VocabularyViewModel by viewModels()
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,83 +60,72 @@ class SearchVocabularyActivity : ComponentActivity() {
             VocaryTheme {
                 Scaffold(
                     modifier = Modifier
-                        .fillMaxSize(),
-                    containerColor = MaterialTheme.colorScheme.surface
-                ) {
+                        .windowInsetsPadding(WindowInsets.systemBars)
+                        .fillMaxSize()
+                ) { innerPadding ->
 
                     var searchText by remember { mutableStateOf("") }
 
-                    val isLoading = searchVocabularyViewModel.isLoading
+                    val state by searchVocabularyViewModel.uiState.collectAsState()
 
                     LaunchedEffect(searchText) {
                         delay(500)
-                        if (searchText.isNotEmpty()) {
-                            searchVocabularyViewModel.fetchDefinition(searchText)
+
+                        searchVocabularyViewModel.fetchDefinition(searchText)
+
+                    }
+
+                    LaunchedEffect(Unit) {
+                        vocabViewModel.uiMessage.collect { message ->
+                            applicationContext.showMessage(message)
                         }
                     }
 
                     Column(
                         modifier = Modifier
-                            .padding(vertical = 64.dp)
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                            .padding(24.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            Icon(
-                                imageVector = Icons.Default.ArrowBackIosNew,
-                                contentDescription = "Back",
-                                modifier = Modifier.clickable {
-                                    finish()
-                                }
-                            )
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Text(
-                                text = "Search Vocabulary",
-                                style = MaterialTheme.typography.headlineMedium
-                            )
+                        TitleTopBar("Search Vocabulary") {
+                            finish()
                         }
 
-//                        SearchNoFilter(searchQuery = searchText) {
-//                            searchText = it
-//                        }
-//
-//                        LazyColumn(
-//                            modifier = Modifier
-//                        ) {
-//
-//                            if (isLoading) {
-//                                items(4) {
-//                                    ItemShimmer()
-//                                }
-//                            } else {
-//                                if (result.isNullOrEmpty()) {
-//                                    item {
-//                                        Box(Modifier.fillParentMaxHeight(0.8f)) {
-//                                            EmptyData()
-//                                        }
-//                                    }
-//                                } else {
-//                                    itemsIndexed(result) { i, it ->
-//
-//                                        val vocab = it.toVocabDetailEntity(true)
-//                                        val meanings = vocab.meanings[0]
-//                                        val definitions = meanings.definitions[0]
-//
-//                                        ItemSearchVocabulary(
-//                                            word = vocab.word,
-//                                            definition = "(${meanings.partOfSpeech}) ${definitions.definition})",
-//                                        ) {
-//                                            vocabViewModel.insertDetail(vocab)
-//                                            showMessage("Success add to my own word")
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
+                        SearchNoFilter(searchQuery = searchText) {
+                            searchText = it
+                        }
+
+                        LazyColumn(
+                            modifier = Modifier
+                        ) {
+
+                            if (state.isLoading) {
+                                items(4) {
+                                    ItemShimmer()
+                                }
+                            } else {
+                                if (state.result.isEmpty()) {
+                                    item {
+                                        Box(Modifier.fillParentMaxHeight(0.8f)) {
+                                            EmptyData()
+                                        }
+                                    }
+                                } else {
+                                    itemsIndexed(state.result) { i, it ->
+
+                                        val vocab = it.toVocabularyEntity()
+                                        val meanings = vocab.definitions.firstOrNull()
+
+                                        ItemSearchVocabulary(
+                                            word = vocab.word,
+                                            definition = "(${meanings?.partOfSpeech}) ${meanings?.definition})",
+                                        ) {
+                                            vocabViewModel.insertIfNotExists(vocab)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
