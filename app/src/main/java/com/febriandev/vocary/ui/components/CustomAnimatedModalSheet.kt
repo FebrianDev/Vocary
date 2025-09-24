@@ -11,10 +11,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -55,12 +58,13 @@ fun CustomAnimatedModalSheet(
     ) {
         Box(
             modifier = Modifier
+                .windowInsetsPadding(WindowInsets.systemBars)
                 .fillMaxSize()
                 .background(
                     MaterialTheme.colorScheme.background,
                     //RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                 )
-                .padding(horizontal = 24.dp, vertical = 64.dp)
+                .padding(24.dp)
         ) {
             content()
             Column(

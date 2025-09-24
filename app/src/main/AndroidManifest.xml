@@ -26,11 +26,11 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Vocary">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            </intent-filter>-->
         </activity>
 
         <activity
@@ -38,11 +38,11 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Vocary">
-            <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.MAIN" />-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-            <!--            </intent-filter>-->
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity
@@ -58,6 +58,18 @@
         </activity>
 
         <activity
+            android:name=".ui.SubscriptionActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+        </activity>
+
+        <activity
             android:name=".ui.auth.AuthActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -70,16 +82,42 @@
         </activity>
 
         <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary" />
+
+        <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Vocary" />
 
         <activity
+            android:name=".ui.onboard.DownloadActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary">
+
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            </intent-filter>-->
+
+        </activity>
+
+        <activity
             android:name=".ui.onboard.LoadingActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Vocary" />
+            android:theme="@style/Theme.Vocary">
+            <!--                        <intent-filter>-->
+            <!--                            <action android:name="android.intent.action.MAIN" />-->
+
+            <!--                            <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--                        </intent-filter>-->
+        </activity>
 
         <activity
             android:name=".ui.minigame.MiniGameActivity"
@@ -119,6 +157,12 @@
 
         <activity
             android:name=".ui.search.MyOwnWordActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Vocary" />
+
+        <activity
+            android:name=".ui.content.PracticeActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Vocary" />

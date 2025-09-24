@@ -45,7 +45,7 @@ fun VocabularyEntity.toVocabulary(): Vocabulary {
         word = this.word,
         phonetic = this.pronunciation ?: firstPhonetic ?: "",
         audio = firstAudio ?: "",
-        sourceUrl = firstUrl ?: "",
+        sourceUrl = sourceUrls.firstOrNull() ?: firstUrl ?: "",
         definition = firstDefinition?.definition ?: "",
         partOfSpeech = firstDefinition?.partOfSpeech ?: "",
         synonyms = firstDefinition?.synonyms ?: emptyList(),

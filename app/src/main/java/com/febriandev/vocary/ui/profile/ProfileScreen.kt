@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
@@ -28,8 +29,10 @@ import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,10 +44,18 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.febriandev.vocary.ui.auth.AuthActivity
 import com.febriandev.vocary.ui.components.CustomAnimatedModalSheet
+import com.febriandev.vocary.ui.components.ProgressDialog
+import com.febriandev.vocary.ui.theme.PronounceState
+import com.febriandev.vocary.ui.theme.ThemeMode
 import com.febriandev.vocary.ui.theme.ThemeState
+import com.febriandev.vocary.utils.ConnHelper
 import com.febriandev.vocary.utils.Constant.DARK_MODE
 import com.febriandev.vocary.utils.Constant.NOTIFICATION
+import com.febriandev.vocary.utils.Constant.PRONOUNCE
+import com.febriandev.vocary.utils.DialogOK
+import com.febriandev.vocary.utils.DialogYesNo
 import com.febriandev.vocary.utils.Prefs
+import com.febriandev.vocary.utils.showMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,8 +65,10 @@ fun ProfileScreen(
     showProfile: Boolean,
     scope: CoroutineScope,
     context: Context,
+    activity: Activity,
+    syncData: () -> Unit,
     onDeleteData: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
 
     var isCheckedNotification by remember { mutableStateOf(Prefs[NOTIFICATION, true]) }
@@ -89,16 +102,33 @@ fun ProfileScreen(
                         icon = Icons.Default.Person,
                         title = "Profile",
                         modifier = Modifier.padding(vertical = 12.dp),
-                        onClick = { }
+                        onClick = {
+                            val intent = Intent(context, ProfileActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(intent)
+
+                        }
                     )
 
+//                    SettingsRow(
+//                        icon = Icons.Default.Brightness4,
+//                        title = "Dark Mode",
+//                        switchChecked = ThemeState.isDarkMode.value,
+//                        onSwitchChange = {
+//                            ThemeState.isDarkMode.value = it
+//                            Prefs[DARK_MODE] = it
+//                        }
+//                    )
+
+                    ThemeSettingsRow(modifier = Modifier.padding(vertical = 12.dp))
+
                     SettingsRow(
-                        icon = Icons.Default.Brightness4,
-                        title = "Dark Mode",
-                        switchChecked = ThemeState.isDarkMode.value,
+                        icon = Icons.AutoMirrored.Filled.VolumeUp,
+                        title = "Pronounce",
+                        switchChecked = PronounceState.isPronounce.value,
                         onSwitchChange = {
-                            ThemeState.isDarkMode.value = it   // trigger recompose
-                            Prefs[DARK_MODE] = it
+                            PronounceState.isPronounce.value = it
+                            Prefs[PRONOUNCE] = it
                         }
                     )
 
@@ -116,7 +146,13 @@ fun ProfileScreen(
                         icon = Icons.Default.Settings,
                         title = "Sync Data to Server",
                         modifier = Modifier.padding(vertical = 12.dp),
-                        onClick = { }
+                        onClick = {
+                            if (ConnHelper.hasConnection(context)) {
+                                syncData.invoke()
+                            } else {
+                                context.showMessage("No Internet Connection...")
+                            }
+                        }
                     )
 
                     SettingsRow(
@@ -138,63 +174,40 @@ fun ProfileScreen(
         }
     }
 
-    if (isAbout) {
-        AlertDialog(
-            onDismissRequest = { isAbout = false },
-            title = { Text("Vocery") },
-            text = {
-                Text("Vocary - Vocab Mastery is an interactive and user-friendly vocabulary learning app designed to help learners of all levels master English words effectively")
-            },
-            containerColor = MaterialTheme.colorScheme.background,
-            confirmButton = {
-                Text(text = "OK", modifier = Modifier.clickable {
-                    isAbout = false
-                })
-            },
-            dismissButton = {
-
-            }
-        )
+    DialogOK(
+        isAbout,
+        "Vocary",
+        "Vocary - Vocab Mastery is an interactive and user-friendly vocabulary learning app designed to help learners of all levels master English words effectively"
+    ) {
+        isAbout = false
     }
 
-    if (isLogout) {
-        AlertDialog(
-            onDismissRequest = { isLogout = false },
-            title = { Text("Are you sure?") },
-            text = {
-                Text("You'll lose all your data")
-            },
-            containerColor = MaterialTheme.colorScheme.background,
-            confirmButton = {
-                Text(text = "Yes", modifier = Modifier.clickable {
-                    scope.launch {
-                        logout = true
-                        isLogout = false
+    DialogYesNo(isLogout, "Are you sure?", "You'll lose all your data", {
+        isLogout = false
+    }) {
 
-                        //clear all data
-                        Prefs.clear()
-                        onDeleteData.invoke()
+        scope.launch {
+            logout = true
+            isLogout = false
 
-                        delay(3000)
+            //clear all data
+            Prefs.clear()
+            onDeleteData.invoke()
 
-                        logout = false
-                        val intent = Intent(context, AuthActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                        (context as Activity).finish()
-                    }
-                })
-            },
-            dismissButton = {
-                Text(text = "No", modifier = Modifier.clickable { isLogout = false })
-            }
-        )
+            delay(3000)
+
+            logout = false
+            val intent = Intent(context, AuthActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+            activity.finish()
+        }
     }
 
     if (logout) {
-//        ProgressDialog {
-//
-//        }
+        ProgressDialog {
+
+        }
     }
 
 }
@@ -276,3 +289,89 @@ fun SettingsRow(
     }
     HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
 }
+
+@Composable
+fun ThemeSettingsRow(modifier: Modifier = Modifier) {
+    val selectedTheme by ThemeState.themeMode
+    var showDialog by remember { mutableStateOf(false) }
+
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(16.dp)
+//    ) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable {
+                showDialog = true
+            }) {
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.Brightness4,
+                contentDescription = "Theme",
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Theme",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = "Arrow Right",
+        )
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Choose Theme") },
+            text = {
+                Column {
+                    ThemeMode.entries.forEach { mode ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    ThemeState.themeMode.value = mode
+                                    Prefs[DARK_MODE] = mode.name
+                                    showDialog = false // tutup dialog setelah pilih
+                                }
+                                .padding(vertical = 2.dp)
+                        ) {
+                            RadioButton(
+                                selected = (mode == selectedTheme),
+                                onClick = {
+                                    ThemeState.themeMode.value = mode
+                                    Prefs[DARK_MODE] = mode.name
+                                    showDialog = false
+                                }
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(mode.label, style = MaterialTheme.typography.bodyLarge)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
+    HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
+    // }
+}
+
+
+

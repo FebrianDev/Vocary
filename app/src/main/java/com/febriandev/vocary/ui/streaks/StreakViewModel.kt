@@ -45,7 +45,7 @@ class StreakViewModel @Inject constructor(private val repository: StreakReposito
             val today = LocalDate.now().toString()
             val existing = repository.getStreakByDate(type, today)
 
-         //   if (existing == null) {
+            if (existing == null) {
                 val streak = StreakEntity(
                     streakType = type,
                     date = today,
@@ -58,7 +58,7 @@ class StreakViewModel @Inject constructor(private val repository: StreakReposito
                     OPEN_APP -> _showAppOpenStreak.value = true
                     DAILY_GOAL -> _showDailyGoalStreak.value = true
                 }
-          //  }
+           }
         }
     }
 

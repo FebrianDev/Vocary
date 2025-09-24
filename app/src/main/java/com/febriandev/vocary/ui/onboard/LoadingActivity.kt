@@ -4,16 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +35,8 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.febriandev.vocary.BaseActivity
 import com.febriandev.vocary.MainActivity
+import com.febriandev.vocary.ui.theme.ThemeMode
+import com.febriandev.vocary.ui.theme.ThemeState
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -48,24 +53,31 @@ class LoadingActivity : BaseActivity() {
 
         setContent {
             VocaryTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    LoadingScreen(level, topic) {
-                        val intent = Intent(applicationContext, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        startActivity(intent)
-                        finish()
-                    }
+
+                LoadingScreen(level, topic) {
+                    val intent = Intent(applicationContext, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                    finish()
                 }
+
             }
         }
     }
 
     @Composable
     fun LoadingScreen(level: String, topic: String, onNavigateToHome: () -> Unit) {
-        val composition by rememberLottieComposition(LottieCompositionSpec.Asset("loading.json"))
+
+        val themeMode by ThemeState.themeMode
+        val isSystemDark = isSystemInDarkTheme()
+
+        val darkTheme = when (themeMode) {
+            ThemeMode.LIGHT -> false
+            ThemeMode.DARK -> true
+            ThemeMode.SYSTEM -> isSystemDark
+        }
+
+        val composition by rememberLottieComposition(LottieCompositionSpec.Asset(if (darkTheme) "loading_dark.json" else "loading_vocabulary.json"))
         val progress by animateLottieCompositionAsState(
             composition = composition,
             iterations = LottieConstants.IterateForever
@@ -74,7 +86,7 @@ class LoadingActivity : BaseActivity() {
         val loadingTexts = listOf(
             "Preparing your vocabulary...",
             "Connecting to AI...",
-            "Generating words based on your level & topic...",
+            "Generating words\nbased on your level & topic...",
             "Getting definitions from dictionary...",
             "Almost done!"
         )
@@ -101,20 +113,24 @@ class LoadingActivity : BaseActivity() {
             }
         }
 
-        Box(
+        Scaffold(
             modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
+                .windowInsetsPadding(WindowInsets.systemBars)
+                .fillMaxSize()
+        ) { innerPadding ->
+
             Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .padding(bottom = 64.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(bottom = 64.dp)
             ) {
                 LottieAnimation(
                     composition = composition,
                     progress = { progress },
-                    modifier = Modifier.size(200.dp)
+                    modifier = Modifier.size(240.dp)
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(

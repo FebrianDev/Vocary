@@ -73,6 +73,7 @@ import com.febriandev.vocary.ui.streaks.StreakViewModel
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.febriandev.vocary.ui.vm.UserViewModel
 import com.febriandev.vocary.ui.vm.VocabularyViewModel
+import com.febriandev.vocary.utils.ConnHelper
 import com.febriandev.vocary.utils.Constant.DAILY_GOAL
 import com.febriandev.vocary.utils.Constant.LEVEL
 import com.febriandev.vocary.utils.Constant.OPEN_APP
@@ -80,6 +81,7 @@ import com.febriandev.vocary.utils.Constant.TOPIC
 import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.utils.ScreenshotBox
 import com.febriandev.vocary.utils.ScreenshotController
+import com.febriandev.vocary.utils.showMessage
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -163,6 +165,7 @@ class MainActivity : BaseActivity() {
                     }
                 }
 
+
                 Scaffold(
                     modifier = Modifier
                         .windowInsetsPadding(WindowInsets.systemBars)
@@ -188,6 +191,7 @@ class MainActivity : BaseActivity() {
                             if (!shouldCaptureScreenshot) {
                                 if (user != null) {
                                     VocabularyTopBar(
+                                        isPremium = user?.isPremium ?: false,
                                         name = user?.name ?: "",
                                         streakDays = 8,
                                         todayCount = dailyProgress?.progress ?: 0,
@@ -214,7 +218,7 @@ class MainActivity : BaseActivity() {
 
                                 onProgress = { id ->
                                     progressViewModel.onVocabularyKnown(id)
-                                    if (dailyProgress != null && dailyProgress?.progress!! >= PROGRESS_MAX) {
+                                    if (dailyProgress != null && dailyProgress?.progress!! >= PROGRESS_MAX - 1) {
                                         streakViewModel.markStreak(DAILY_GOAL, true)
                                     }
                                 },
@@ -302,6 +306,12 @@ class MainActivity : BaseActivity() {
                                         color = MaterialTheme.colorScheme.surface,
                                         tonalElevation = 4.dp,
                                         modifier = Modifier.clickable {
+
+                                            if (user?.isPremium == false) {
+                                                showMessage("You need to access premium!")
+                                                return@clickable
+                                            }
+
                                             val intent = Intent(
                                                 applicationContext,
                                                 MiniGameActivity::class.java
@@ -358,7 +368,9 @@ class MainActivity : BaseActivity() {
                             showInfo = false
                         }
 
-                        VocabularyNote(selectedVocab, showNote, vocabViewModel) { showNote = false }
+                        VocabularyNote(selectedVocab, showNote, vocabViewModel) {
+                            showNote = false
+                        }
 
                         VocabularyShare(
                             selectedVocab,
@@ -375,48 +387,58 @@ class MainActivity : BaseActivity() {
 
                         StreakScreen()
                     }
+                }
 
-                    ContentScreen(user?.isPremium ?: true, showContent, applicationContext) {
-                        showContent = false
-                        if (level != Prefs[LEVEL, "Beginner (A1)"] || topic != Prefs[TOPIC, "General Vocabulary"]) {
-                            //  showLoadingDialog = true
-                            level = Prefs[LEVEL, "Beginner (A1)"]
-                            topic = Prefs[TOPIC, "General Vocabulary"]
+                ContentScreen(user?.isPremium ?: false, showContent, applicationContext) {
+                    showContent = false
+                    if (level != Prefs[LEVEL, "Beginner (A1)"] || topic != Prefs[TOPIC, "General Vocabulary"]) {
+                        //  showLoadingDialog = true
+                        level = Prefs[LEVEL, "Beginner (A1)"]
+                        topic = Prefs[TOPIC, "General Vocabulary"]
 
 //                            vocabViewModel.startGenerateProcess(
 //                                Prefs[TOPIC, "General Vocabulary"],
 //                                Prefs[LEVEL, "Beginner (A1)"]
 //                            )
 
-                            /*  coroutineScope.launch {
+                        /*  coroutineScope.launch {
 
-                                  val user = userViewModel.getCurrentUser()
-                                  if (user != null && level != user.vocabLevel || topic != user?.vocabTopic) {
-  //                                    startGenerateProcess(
-  //                                        user?.vocabTopic ?: "Common English",
-  //                                        user?.vocabLevel ?: "Intermediate"
-  //                                    )
+                              val user = userViewModel.getCurrentUser()
+                              if (user != null && level != user.vocabLevel || topic != user?.vocabTopic) {
+//                                    startGenerateProcess(
+//                                        user?.vocabTopic ?: "Common English",
+//                                        user?.vocabLevel ?: "Intermediate"
+//                                    )
 
-                                      delay(13000) // Simulasi proses generate 10 detik
-                                      vocabViewModel.getAllVocabulary()
-                                      delay(2000)
-                                      showLoadingDialog = false
-                                      pagerState.scrollToPage(0) // Kembali ke halaman awal
-                                  }
-                              }*/
-                        }
-                    }
-//
-                    ProfileScreen(
-                        showProfile,
-                        coroutineScope,
-                        applicationContext,
-                        {
-                            // vocabViewModel.deleteAllData()
-                        }) {
-                        showProfile = false
+                                  delay(13000) // Simulasi proses generate 10 detik
+                                  vocabViewModel.getAllVocabulary()
+                                  delay(2000)
+                                  showLoadingDialog = false
+                                  pagerState.scrollToPage(0) // Kembali ke halaman awal
+                              }
+                          }*/
                     }
                 }
+//
+                ProfileScreen(
+                    showProfile,
+                    coroutineScope,
+                    applicationContext,
+                    this@MainActivity,
+                    {
+                        if (ConnHelper.hasConnection(applicationContext)) {
+                            syncData()
+                        } else {
+                            showMessage("No Internet Connection!")
+                        }
+
+                    },
+                    {
+                        vocabViewModel.deleteAllData()
+                    }) {
+                    showProfile = false
+                }
+
 
                 if (showLoadingDialog) {
                     AlertDialog(

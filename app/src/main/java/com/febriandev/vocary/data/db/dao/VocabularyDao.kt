@@ -126,4 +126,26 @@ interface VocabularyDao {
     ORDER BY id DESC
 """)
     suspend fun searchOwnWord(query: String): List<VocabularyEntity>
+
+    @Query("DELETE FROM vocabulary")
+    suspend fun deleteVocabulary()
+
+    @Query("DELETE FROM daily_progress")
+    suspend fun deleteProgress()
+
+    @Query("DELETE FROM generate_vocab")
+    suspend fun deleteGenerate()
+
+    @Query("DELETE FROM user")
+    suspend fun deleteUser()
+
+    @Query("DELETE FROM game_session")
+    suspend fun deleteGame()
+
+    @Query("DELETE FROM streak")
+    suspend fun deleteStreak()
+
+    @Query("DELETE FROM search_vocabulary")
+    suspend fun deleteSearch()
+
 }

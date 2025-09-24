@@ -18,6 +18,8 @@ object Constant {
     const val NOTIFICATION = "NOTIFICATION"
     const val DARK_MODE = "DARK_MODE"
 
+    const val PRONOUNCE = "PRONOUNCE"
+
     //STREAK TYPE
     const val DAILY_GOAL = "DAILY_GOAL"
     const val OPEN_APP = "OPEN_APP"

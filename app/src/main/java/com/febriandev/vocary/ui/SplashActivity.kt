@@ -7,16 +7,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.febriandev.vocary.MainActivity
 import com.febriandev.vocary.ui.auth.AuthActivity
-import com.febriandev.vocary.ui.auth.RegisterActivity
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.febriandev.vocary.ui.vm.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,37 +35,41 @@ class SplashActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VocaryTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    SplashScreen {
-                        if (userViewModel.getCurrentUser() == null) {
-                            val intent = Intent(applicationContext, AuthActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
-                            finish()
-                        } else {
-                            val intent = Intent(applicationContext, MainActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
-                            finish()
-                        }
+                SplashScreen {
+                    if (userViewModel.getCurrentUser() == null) {
+                        val intent = Intent(applicationContext, AuthActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        val intent = Intent(applicationContext, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                        finish()
                     }
+
                 }
             }
         }
     }
+}
 
-    @Composable
-    fun SplashScreen(onSplashFinished: suspend () -> Unit) {
-        LaunchedEffect(Unit) {
-            delay(100)
-            onSplashFinished()
-        }
+@Composable
+fun SplashScreen(onSplashFinished: suspend () -> Unit) {
+    LaunchedEffect(Unit) {
+        delay(100)
+        onSplashFinished()
+    }
 
+    Scaffold(
+        modifier = Modifier
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
         Box(
             modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
                 .padding(horizontal = 16.dp, vertical = 16.dp),
         ) {
@@ -109,5 +116,6 @@ class SplashActivity : ComponentActivity() {
 //            }
 
         }
+
     }
 }

@@ -48,7 +48,7 @@ fun generateQuestion(vocabs: List<VocabularyEntity>): Question? {
             Question(
                 vocabId = target.id,
                 type = type,
-                prompt = "Apa arti dari kata '${target.word}'?",
+                prompt = "What is the meaning of the word '${target.word}'?",
                 options = options,
                 correctAnswer = correct
             )
@@ -68,7 +68,7 @@ fun generateQuestion(vocabs: List<VocabularyEntity>): Question? {
             Question(
                 vocabId = target.id,
                 type = type,
-                prompt = "Kata apa yang sesuai dengan definisi:\n“${targetDef.definition}”",
+                prompt = "Which word matches the definition:\n“${targetDef.definition}”",
                 options = options,
                 correctAnswer = correct
             )

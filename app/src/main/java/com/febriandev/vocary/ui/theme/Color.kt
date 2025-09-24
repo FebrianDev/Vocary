@@ -28,6 +28,13 @@ val Pink40 = Color(0xFF7D5260)
 //val DarkTextPrimary = Color(0xFFFFFFFF)
 //val DarkTextSecondary = Color(0xFFB0BEC5)
 
+//primary #ff8e3a
+//second #ffbf00
+
+//dark primary
+//primary 42a5f5
+//second 00c5ff
+
 val OrangeDeep = Color(0xFFFF6F00)    // Primary
 val BluePrimaryDark = Color(0xFF42A5F5) // primary Dark
 val TealDark = Color(0xFF00695C)      // Secondary

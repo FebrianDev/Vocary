@@ -33,7 +33,7 @@ fun TitleTopBar(
            tint = MaterialTheme.colorScheme.onSurface
         )
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         Text(
             text = title,

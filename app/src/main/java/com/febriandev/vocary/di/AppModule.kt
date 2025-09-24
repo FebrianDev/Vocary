@@ -3,6 +3,7 @@ package com.febriandev.vocary.di
 import android.app.Application
 import androidx.room.Room
 import com.febriandev.vocary.data.db.AppDatabase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -51,6 +52,18 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSearchVocabularyDao(db: AppDatabase) = db.searchVocabularyDao()
+
+    @Provides
+    @Singleton
+    fun provideSyncDataDao(db: AppDatabase) = db.syncDataDao()
+
+    @Provides
+    @Singleton
+    fun provideDownloadDataDao(db: AppDatabase) = db.downloadDataDao()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth() = FirebaseAuth.getInstance()
 
     @Provides
     @Singleton

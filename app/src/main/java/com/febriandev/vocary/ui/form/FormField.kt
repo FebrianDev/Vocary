@@ -25,6 +25,7 @@ fun FormField(
     label: String = "",
     minLines: Int = 1,
     maxLines: Int = 1,
+    readOnly: Boolean = false,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
     onValueChange: (text: String) -> Unit = {}
@@ -64,6 +65,7 @@ fun FormField(
         maxLines = maxLines,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
+        readOnly = readOnly
     )
 
 }

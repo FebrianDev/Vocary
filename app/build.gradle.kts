@@ -220,12 +220,29 @@ android {
         implementation("androidx.work:work-runtime-ktx:2.9.0")
 
         //revenue cat
-      //  implementation("com.revenuecat.purchases:purchases:6.25.0")
+        implementation("com.revenuecat.purchases:purchases:8.7.0")
 
         implementation("com.google.android.gms:play-services-auth:20.7.0")
 
         //lottie
         implementation("com.airbnb.android:lottie-compose:6.1.0")
+
+        //system ui
+        implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
+
+        //livedata
+        implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+        implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+        implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+
+        //showcase
+        implementation("io.github.jocoand:showcase-sequence:1.3.1")
+
+        //lottie
+        implementation("com.airbnb.android:lottie-compose:6.1.0")
+
+        //revenue cat
+        implementation("com.revenuecat.purchases:purchases:8.7.0")
 
 //        // Fix ListenableFuture conflict
 //        implementation("androidx.concurrent:concurrent-futures:1.1.0")

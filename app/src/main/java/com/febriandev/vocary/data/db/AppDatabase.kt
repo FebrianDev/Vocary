@@ -3,10 +3,12 @@ package com.febriandev.vocary.data.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.febriandev.vocary.data.db.dao.DailyProgressDao
+import com.febriandev.vocary.data.db.dao.DownloadDataDao
 import com.febriandev.vocary.data.db.dao.GameSessionDao
 import com.febriandev.vocary.data.db.dao.GenerateVocabDao
 import com.febriandev.vocary.data.db.dao.SearchVocabularyDao
 import com.febriandev.vocary.data.db.dao.StreakDao
+import com.febriandev.vocary.data.db.dao.SyncDataDao
 import com.febriandev.vocary.data.db.dao.UserDao
 import com.febriandev.vocary.data.db.dao.VocabularyDao
 import com.febriandev.vocary.data.db.entity.DailyProgressEntity
@@ -19,7 +21,7 @@ import com.febriandev.vocary.data.db.entity.VocabularyEntity
 
 @Database(
     entities = [GeneratedVocabEntity::class, VocabularyEntity::class, GameSessionEntity::class, DailyProgressEntity::class, StreakEntity::class, UserEntity::class, SearchVocabularyEntity::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -32,5 +34,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
 
     abstract fun searchVocabularyDao(): SearchVocabularyDao
+    abstract fun syncDataDao(): SyncDataDao
+
+    abstract fun downloadDataDao(): DownloadDataDao
 
 }

@@ -78,7 +78,7 @@ fun PasswordTextField(
         modifier = modifier
             .padding(top = 4.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = TextFieldDefaults.colors(
             cursorColor = MaterialTheme.colorScheme.primary,
             focusedContainerColor = Color.Transparent,

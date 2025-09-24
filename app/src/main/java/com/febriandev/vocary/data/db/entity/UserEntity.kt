@@ -1,9 +1,12 @@
 package com.febriandev.vocary.data.db.entity
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "user")
+@Parcelize
 data class UserEntity(
     @PrimaryKey val id: String, // misalnya pakai UID Firebase
     val name: String,
@@ -15,8 +18,8 @@ data class UserEntity(
     val vocabLevel: String?, // Beginner, Intermediate, Advanced
     val vocabTopic: String?, // misalnya "Business", "Travel"
     val isPremium: Boolean,
-    val premiumDuration: Long?, // timestamp expire premium
+    val premiumDuration: String?,
     val deviceName: String?,
     val deviceId: String?,
     val isSync: Boolean = false,
-)
+) : Parcelable

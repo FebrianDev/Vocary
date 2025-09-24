@@ -37,7 +37,10 @@ import java.io.IOException
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 import java.util.UUID
 import kotlin.math.ln
 
@@ -287,4 +290,14 @@ fun compositeColors(foreground: Color, background: Color): Color {
 
 fun generateRandomId(): String {
     return UUID.randomUUID().toString()
+}
+
+fun getExpirationDate(days: Int = 30): String {
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    calendar.add(Calendar.DAY_OF_YEAR, days)
+
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+    return dateFormat.format(calendar.time)
 }

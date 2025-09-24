@@ -26,9 +26,9 @@ import com.febriandev.vocary.ui.components.CardButton
 import com.febriandev.vocary.ui.components.CustomAnimatedModalSheet
 import com.febriandev.vocary.ui.favorite.FavoriteActivity
 import com.febriandev.vocary.ui.history.HistoryActivity
-import com.febriandev.vocary.ui.minigame.MiniGameActivity
 import com.febriandev.vocary.ui.search.MyOwnWordActivity
 import com.febriandev.vocary.ui.search.SearchVocabularyActivity
+import com.febriandev.vocary.utils.showMessage
 
 @Composable
 fun ContentScreen(
@@ -86,7 +86,14 @@ fun ContentScreen(
                 icon = Icons.Default.Search,
                 text = "Search Vocabulary",
                 isPremium = isPremium,
+                iconPremium = true,
                 onClick = {
+
+                    if (!isPremium) {
+                        context.showMessage("You need to access premium!")
+                        return@CardButton
+                    }
+
                     val intent =
                         Intent(context.applicationContext, SearchVocabularyActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -101,7 +108,14 @@ fun ContentScreen(
                 icon = Icons.Default.EditNote,
                 text = "My Own Word",
                 isPremium = isPremium,
+                iconPremium = true,
                 onClick = {
+
+                    if (!isPremium) {
+                        context.showMessage("You need to access premium!")
+                        return@CardButton
+                    }
+
                     val intent = Intent(context.applicationContext, MyOwnWordActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(intent)
@@ -114,9 +128,15 @@ fun ContentScreen(
                 modifier = Modifier.fillMaxWidth(),
                 icon = Lucide.GraduationCap,
                 text = "Practice",
-                isPremium = isPremium,
+                isPremium = isPremium, iconPremium = true,
                 onClick = {
-                    val intent = Intent(context.applicationContext, MiniGameActivity::class.java)
+
+                    if (!isPremium) {
+                        context.showMessage("You need to access premium!")
+                        return@CardButton
+                    }
+
+                    val intent = Intent(context.applicationContext, PracticeActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(intent)
                 }
@@ -136,8 +156,14 @@ fun ContentScreen(
                 modifier = Modifier.fillMaxWidth(),
                 icon = Icons.Default.ArrowUpward,
                 text = "Change Level",
-                isPremium = isPremium,
+                isPremium = isPremium, iconPremium = true,
                 onClick = {
+
+                    if (!isPremium) {
+                        context.showMessage("You need to access premium!")
+                        return@CardButton
+                    }
+
                     val intent = Intent(context.applicationContext, ChangeLevelActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(intent)
@@ -150,8 +176,14 @@ fun ContentScreen(
                 modifier = Modifier.fillMaxWidth(),
                 icon = Icons.Default.Topic,
                 text = "Change Topic",
-                isPremium = isPremium,
+                isPremium = isPremium, iconPremium = true,
                 onClick = {
+
+                    if (!isPremium) {
+                        context.showMessage("You need to access premium!")
+                        return@CardButton
+                    }
+
                     val intent = Intent(context.applicationContext, ChangeTopicActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(intent)

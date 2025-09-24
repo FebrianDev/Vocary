@@ -8,13 +8,16 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.febriandev.vocary.utils.Constant.DARK_MODE
+import com.febriandev.vocary.utils.Constant.PRONOUNCE
 import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.utils.Prefs.set
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val LightColorPalette = lightColorScheme(
     primary = OrangeDeep,
@@ -65,9 +68,9 @@ private val DarkColorPalette = darkColorScheme(
 
 @Composable
 fun VocaryTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+   // darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    //dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
 //    val colorScheme = when {
@@ -80,12 +83,28 @@ fun VocaryTheme(
 //        else -> LightColorPalette
 //    }
 
-    val darkTheme by ThemeState.isDarkMode
+    val systemUiController = rememberSystemUiController()
 
-    val colorScheme = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
+    val themeMode by ThemeState.themeMode
+    val isSystemDark = isSystemInDarkTheme()
+
+    val darkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemDark
+    }
+
+    val colorScheme = if (darkTheme) DarkColorPalette else LightColorPalette
+
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = colorScheme.background,   // atau colorScheme.surface
+            darkIcons = !darkTheme
+        )
+        systemUiController.setNavigationBarColor(
+            color = colorScheme.surface,      // biasanya lebih soft
+            darkIcons = !darkTheme
+        )
     }
 
 
@@ -98,6 +117,20 @@ fun VocaryTheme(
 }
 
 object ThemeState {
+    var themeMode = mutableStateOf(
+        ThemeMode.valueOf(Prefs[DARK_MODE, ThemeMode.SYSTEM.name])
+    )
+}
+
+
+enum class ThemeMode(val label: String) {
+    LIGHT("Light"),
+    DARK("Dark"),
+    SYSTEM("System")
+}
+
+
+object PronounceState {
     // initial dari Prefs
-    var isDarkMode = mutableStateOf(Prefs[DARK_MODE, false])
+    var isPronounce = mutableStateOf(Prefs[PRONOUNCE, false])
 }

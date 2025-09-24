@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.febriandev.vocary.BaseActivity
 import com.febriandev.vocary.data.db.entity.UserEntity
 import com.febriandev.vocary.domain.AppUser
+import com.febriandev.vocary.ui.SubscriptionActivity
 import com.febriandev.vocary.ui.form.FormField
 import com.febriandev.vocary.ui.form.FormOptionField
 import com.febriandev.vocary.ui.form.FormOptionTopic
@@ -157,10 +158,10 @@ class OnboardActivity : BaseActivity() {
 
                             FormStep.WORD -> {
                                 val words = listOf(
-                                    "10 words a week",
-                                    "30 words a week",
-                                    "50 words a week",
-                                    "100 words a week"
+                                    "10",
+                                    "30",
+                                    "50",
+                                    "100"
                                 )
                                 Text(
                                     text = "How many words do you want to learn in a week?",
@@ -169,7 +170,11 @@ class OnboardActivity : BaseActivity() {
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))
                                 words.forEach { data ->
-                                    FormOptionField(option = data, isSelected = data == word) {
+                                    FormOptionField(
+                                        option = data,
+                                        targetVocabulary = true,
+                                        isSelected = data == word
+                                    ) {
                                         onboardViewModel.word.value = it
                                     }
                                 }
@@ -281,14 +286,15 @@ class OnboardActivity : BaseActivity() {
                                             deviceId = getAppId(applicationContext)
                                         )
 
-                                        userViewModel.saveUser(userEntity)
+                                     // userViewModel.saveUser(userEntity)
 
                                         val intent =
                                             Intent(
                                                 applicationContext,
-                                                LoadingActivity::class.java
+                                                SubscriptionActivity::class.java
                                             )
 
+                                        intent.putExtra("user", userEntity)
                                         intent.putExtra("level", level)
                                         intent.putExtra("topic", selectedTopic?.displayName)
 

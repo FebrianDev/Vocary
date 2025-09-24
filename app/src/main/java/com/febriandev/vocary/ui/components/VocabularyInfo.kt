@@ -19,9 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.febriandev.vocary.domain.Vocabulary
 import com.febriandev.vocary.utils.showMessage
-import androidx.core.net.toUri
+import com.google.android.gms.common.wrappers.Wrappers.packageManager
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -136,22 +137,36 @@ fun VocabularyInfo(
 
                 // Source
                 if (selectedVocab.sourceUrl.isNotBlank()) {
-                    Text(
-                        text = "Source: ${selectedVocab.sourceUrl}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(top = 4.dp).clickable {
-                            selectedVocab.sourceUrl.let { url ->
-                                try {
-                                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                    context.showMessage("Can't open link!")
+                    Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(top = 4.dp)) {
+                        Text(
+                            "Source: ", style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+
+                        Text(
+                            text = selectedVocab.sourceUrl,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .clickable {
+                                    selectedVocab.sourceUrl.let { url ->
+                                        try {
+                                            val cleanUrl = url.trim()
+                                            val uri = Uri.parse(cleanUrl)
+
+                                            val intent = Intent(Intent.ACTION_VIEW, uri).apply {
+                                                addCategory(Intent.CATEGORY_BROWSABLE)
+                                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            }
+                                            context.startActivity(Intent.createChooser(intent, "Open with"))
+                                        } catch (e: Exception) {
+                                            e.printStackTrace()
+                                            context.showMessage("Can't open link!")
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

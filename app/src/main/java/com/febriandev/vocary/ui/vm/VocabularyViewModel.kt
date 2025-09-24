@@ -6,12 +6,8 @@ import com.febriandev.vocary.data.db.entity.SrsStatus
 import com.febriandev.vocary.data.db.entity.VocabularyEntity
 import com.febriandev.vocary.data.repository.VocabularyRepository
 import com.febriandev.vocary.domain.Vocabulary
-import com.febriandev.vocary.ui.components.SortOrder
-import com.febriandev.vocary.ui.components.SortType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -186,5 +182,10 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
         }
     }
 
+    fun deleteAllData() {
+        viewModelScope.launch {
+            repository.deleteAllData()
+        }
+    }
 
 }

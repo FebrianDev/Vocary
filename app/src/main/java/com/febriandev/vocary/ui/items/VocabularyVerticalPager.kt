@@ -22,12 +22,16 @@ import com.febriandev.vocary.domain.Vocabulary
 import com.febriandev.vocary.ui.components.VocabularyCard
 import com.febriandev.vocary.ui.vm.VocabularyViewModel
 import com.febriandev.vocary.utils.ConnHelper
+import com.febriandev.vocary.utils.Constant.PRONOUNCE
+import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.utils.downloadAndSaveAudio
 import com.febriandev.vocary.utils.playAudioFromFile
 import com.febriandev.vocary.utils.showMessage
+import com.febriandev.vocary.utils.speakText
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.joco.showcase.sequence.rememberSequenceShowcaseState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -78,6 +82,9 @@ fun VocabularyVerticalPager(
         }
 
         LaunchedEffect(pagerState.currentPage) {
+
+            if(!Prefs[PRONOUNCE, false]) return@LaunchedEffect
+
             val page = pagerState.currentPage
             if (page != lastHandledPage) {
                 lastHandledPage = page
@@ -101,7 +108,7 @@ fun VocabularyVerticalPager(
                 coroutineScope.launch(Dispatchers.Default) {
                     try {
                         if (ConnHelper.hasConnection(applicationContext)) {
-                            //speakText(vocabulary.word)
+                            speakText(vocabulary.word)
                         } else {
                             if (audioFile != null) {
                                 playAudioFromFile(audioFile!!)

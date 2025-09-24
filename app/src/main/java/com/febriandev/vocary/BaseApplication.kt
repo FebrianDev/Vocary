@@ -7,6 +7,8 @@ import com.febriandev.vocary.ui.theme.ThemeState
 import com.febriandev.vocary.utils.Constant.DARK_MODE
 import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.worker.WorkFactory
+import com.revenuecat.purchases.Purchases
+import com.revenuecat.purchases.PurchasesConfiguration
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -19,7 +21,13 @@ class BaseApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         Prefs.init(this)
-        ThemeState.isDarkMode.value = Prefs[DARK_MODE, false]
+      //  ThemeState.themeMode.value = Prefs[DARK_MODE, ThemeState.themeMode.value]
+
+        Purchases.configure(
+            PurchasesConfiguration.Builder(this, "goog_SDrghgQzcdXSqrZMAYWTJQzvGZn")
+                .build()
+        )
+
     }
 
     override fun onTrimMemory(level: Int) {

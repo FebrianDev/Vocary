@@ -27,6 +27,7 @@ fun CardButton(
     text: String,
     modifier: Modifier = Modifier,
     isPremium: Boolean = false,
+    iconPremium:Boolean = false,
     onClick: () -> Unit
 ) {
     Card(
@@ -59,7 +60,7 @@ fun CardButton(
                 )
             }
 
-            if(isPremium) {
+            if(!isPremium && iconPremium) {
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = text,

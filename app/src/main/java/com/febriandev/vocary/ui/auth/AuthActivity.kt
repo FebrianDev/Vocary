@@ -13,12 +13,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
@@ -27,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -47,6 +52,7 @@ import com.febriandev.vocary.BaseActivity
 import com.febriandev.vocary.R
 import com.febriandev.vocary.ui.components.EmailTextField
 import com.febriandev.vocary.ui.components.PasswordTextField
+import com.febriandev.vocary.ui.onboard.DownloadActivity
 import com.febriandev.vocary.ui.onboard.OnboardActivity
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -75,7 +81,7 @@ class AuthActivity : BaseActivity() {
 
                 LaunchedEffect(user) {
                     if (user != null) {
-                        val intent = Intent(applicationContext, OnboardActivity::class.java)
+                        val intent = Intent(applicationContext, DownloadActivity::class.java)
                         intent.putExtra("user", user)
                         startActivity(intent)
                         Log.d("AppUser", user.toString())
@@ -88,92 +94,104 @@ class AuthActivity : BaseActivity() {
                     }
                 }
 
-                Column(
+                Scaffold(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        "Welcome!",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                        .fillMaxSize(),
+                    containerColor = MaterialTheme.colorScheme.background
+                ) { innerPadding ->
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "Boost your vocabulary and make learning fun 🚀",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Spacer(modifier = Modifier.height(24.dp))
-
-                    Image(
-                        painter = painterResource(R.drawable.icon_image2),
-                        contentDescription = "",
-                        modifier = Modifier.size(256.dp)
-                    )
-
-                    EmailTextField(
-                        email = email,
-                        onEmailChange = { email = it }
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    PasswordTextField(
-                        password = password,
-                        onPasswordChange = { password = it },
-                        passwordVisibility = passwordVisibility,
-                        onToggleVisibility = { passwordVisibility = !passwordVisibility }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Button(
-                        onClick = {
-                            authViewModel.signInWithEmail(email, password)
-                        },
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        modifier = Modifier
+                            .windowInsetsPadding(WindowInsets.systemBars)
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Login")
-                    }
+                        Text(
+                            "Welcome!",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
 
-                    TextButton(onClick = {
-                        val intent = Intent(applicationContext, RegisterActivity::class.java)
-                        startActivity(intent)
-                    }) {
-                        Text("Don't have an account? Register")
-                    }
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "Boost your vocabulary and make learning fun",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                    HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
+                        // Spacer(modifier = Modifier.height(24.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Image(
+                            painter = painterResource(R.drawable.icon_image2),
+                            contentDescription = "",
+                            modifier = Modifier.size(224.dp),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                        )
 
-                    GoogleSignInButton(
-                        onSignInResult = { idToken ->
-                            authViewModel.signInWithGoogle(idToken)
+                        EmailTextField(
+                            email = email,
+                            onEmailChange = { email = it }
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        PasswordTextField(
+                            password = password,
+                            onPasswordChange = { password = it },
+                            passwordVisibility = passwordVisibility,
+                            onToggleVisibility = { passwordVisibility = !passwordVisibility }
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Button(
+                            onClick = {
+                                authViewModel.signInWithEmail(email, password)
+                            },
+                            modifier = Modifier.fillMaxWidth().height(48.dp)
+                        ) {
+                            Text("Login")
                         }
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Button(
-                        onClick = {
-                            val intent = Intent(applicationContext, OnboardActivity::class.java)
-                            startActivity(intent)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Sign in without logging in")
-                    }
 
+                        TextButton(onClick = {
+                            val intent = Intent(applicationContext, RegisterActivity::class.java)
+                            startActivity(intent)
+                        }) {
+                            Text("Don't have an account? Register")
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        HorizontalDivider(
+                            Modifier,
+                            DividerDefaults.Thickness,
+                            DividerDefaults.color
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        GoogleSignInButton(
+                            onSignInResult = { idToken ->
+                                authViewModel.signInWithGoogle(idToken)
+                            }
+                        )
+//                    Spacer(modifier = Modifier.height(6.dp))
+//                    Button(
+//                        onClick = {
+//                            val intent = Intent(applicationContext, OnboardActivity::class.java)
+//                            startActivity(intent)
+//                        },
+//                        modifier = Modifier.fillMaxWidth()
+//                    ) {
+//                        Text("Sign in without logging in")
+//                    }
+
+                    }
                 }
             }
         }
@@ -208,7 +226,7 @@ class AuthActivity : BaseActivity() {
             onClick = {
                 launcher.launch(googleSignInClient.signInIntent)
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().height(48.dp)
         ) {
             Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Google")
             Spacer(Modifier.width(8.dp))

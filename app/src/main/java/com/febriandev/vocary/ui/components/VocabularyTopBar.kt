@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,13 +30,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.composables.icons.lucide.Crown
 import com.composables.icons.lucide.Lucide
+import com.febriandev.vocary.R
 
 @Composable
 fun VocabularyTopBar(
+    isPremium: Boolean = false,
     name: String,
     streakDays: Int,
     todayCount: Int,
@@ -51,13 +55,22 @@ fun VocabularyTopBar(
     ) {
         // LEFT: Name and Badge Icon
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Lucide.Crown,
-                contentDescription = "User Icon",
-                tint = colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(28.dp) // lebih besar
-            )
-            Spacer(modifier = Modifier.width(8.dp))
+            if (isPremium) {
+                Image(
+                    painterResource(R.drawable.ic_crown),
+                    contentDescription = "Crown",
+                    modifier = Modifier.size(42.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Lucide.Crown,
+                    contentDescription = "Crown",
+                    tint = colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(28.dp) // lebih besar
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
             Text(
                 text = name,
                 style = MaterialTheme.typography.bodyLarge.copy( // lebih tegas

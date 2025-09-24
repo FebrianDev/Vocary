@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FormOptionField(
     option: String,
+    targetVocabulary: Boolean = false,
     isSelected: Boolean = false,
     onOptionSelected: (option: String) -> Unit
 ) {
@@ -47,7 +48,7 @@ fun FormOptionField(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = option,
+            text = if (targetVocabulary) "$option words a week" else option,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -61,8 +62,7 @@ fun FormOptionField(
                     .background(Color.Gray, shape = CircleShape)
                     .padding(2.dp)
             )
-        }
-        else{
+        } else {
             Box(
                 modifier = Modifier
                     .border(1.dp, Color.Gray, shape = CircleShape)
