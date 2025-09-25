@@ -60,7 +60,7 @@ class MiniGameActivity : ComponentActivity() {
 @Composable
 fun MiniGameScreen(
     viewModel: GameViewModel = hiltViewModel(),
-    defaultTotalQuestions: Int = 2,
+    defaultTotalQuestions: Int = 10,
     onFinish: () -> Unit
 ) {
     val state = viewModel.uiState

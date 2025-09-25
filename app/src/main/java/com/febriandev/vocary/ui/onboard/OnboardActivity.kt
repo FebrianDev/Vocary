@@ -280,7 +280,7 @@ class OnboardActivity : BaseActivity() {
                                             learningGoal = goal,
                                             vocabLevel = level,
                                             vocabTopic = selectedTopic?.displayName,
-                                            isPremium = false, // default, nanti bisa diupdate dari Firestore/RevenueCat
+                                            premium = false, // default, nanti bisa diupdate dari Firestore/RevenueCat
                                             premiumDuration = null,
                                             deviceName = getDeviceName(),
                                             deviceId = getAppId(applicationContext)

@@ -28,7 +28,7 @@ class SyncDataWorker @AssistedInject constructor(
         // Tampilkan notifikasi indeterminate saat sync
         setForeground(createForegroundInfo("Syncing data..."))
 
-        val userId = workerParams.inputData.getString("userId")
+        val userId = workerParams.inputData.getString("uid")
 
         return try {
             if (userId != null) {

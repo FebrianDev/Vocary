@@ -19,7 +19,7 @@ class DownloadDataWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return try {
 
-            val userId = params.inputData.getString("userId")
+            val userId = params.inputData.getString("uid")
             if (userId != null) {
                 repository.getAndSaveUser(userId)
                 repository.getAndSaveVocabularies(userId)

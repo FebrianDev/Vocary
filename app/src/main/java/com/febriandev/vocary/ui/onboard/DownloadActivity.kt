@@ -89,7 +89,8 @@ class DownloadActivity : BaseActivity() {
 
                 LaunchedEffect(Unit) {
                     Log.d("DownloadData", user?.uid.toString())
-                    downloadData(user?.uid ?: "")
+                    //downloadData(user?.uid ?: "")
+                    downloadData("9gVo97ctNtfPHrlehUVXC9BYOe02")
                 }
 
                 Scaffold(

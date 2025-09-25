@@ -77,7 +77,7 @@ abstract class BaseActivity : ComponentActivity() {
         }
     }
 
-    fun syncData() {
+    fun syncData(uid:String) {
         if (!isWorkerRunning("SYNC_DATA")) {
             showMessage("Sync Data...")
             val workRequest = OneTimeWorkRequestBuilder<SyncDataWorker>()
@@ -85,6 +85,11 @@ abstract class BaseActivity : ComponentActivity() {
                     Constraints.Builder()
                         .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
                         .build()
+                )
+                .setInputData(
+                    workDataOf(
+                        "uid" to uid
+                    )
                 )
                 .build()
 

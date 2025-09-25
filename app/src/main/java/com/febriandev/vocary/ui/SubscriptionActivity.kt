@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.febriandev.vocary.data.db.entity.UserEntity
+import com.febriandev.vocary.ui.components.TitleTopBar
 import com.febriandev.vocary.ui.onboard.LoadingActivity
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.febriandev.vocary.ui.vm.RevenueCatViewModel
@@ -67,6 +69,7 @@ class SubscriptionActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val user = intent.getParcelableExtra<UserEntity>("user")
+        val isSetting = intent.getBooleanExtra("isSetting", false)
 
         setContent {
             VocaryTheme {
@@ -75,33 +78,39 @@ class SubscriptionActivity : ComponentActivity() {
                 var redeemCode by remember { mutableStateOf("") }
 
                 val offerings by revenueCatViewModel.offerings.collectAsState()
-                val isPremium by revenueCatViewModel.isPremium.collectAsState()
+                val premium by revenueCatViewModel.isPremium.collectAsState()
 
                 Scaffold(
                     modifier = Modifier
+                        .windowInsetsPadding(WindowInsets.systemBars)
                         .fillMaxSize()
                 ) { innerPadding ->
                     Column(
                         modifier = Modifier
                             .padding(innerPadding)
-                            .windowInsetsPadding(WindowInsets.systemBars)
                             .fillMaxSize()
-                            .padding(16.dp),
+                            .padding(24.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        //    horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Choose Your Premium Plan",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
 
-                        val plans = listOf(
-                            "premium_1m" to "1 Month - \$4.99",
-                            "premium_3m" to "3 Months - \$12.99",
-                            "premium_6m" to "6 Months - \$19.99",
-                            "premium_12m" to "12 Months - \$29.99 (Best Value)"
-                        )
+
+                        if (isSetting) {
+                            TitleTopBar("Subscription") { finish() }
+                        } else {
+                            Text(
+                                text = "Choose Your Premium Plan",
+                                // fontSize = 22.sp,
+                                style = MaterialTheme.typography.headlineMedium,
+                            )
+                        }
+
+//                        val plans = listOf(
+//                            "premium_1m" to "1 Month - \$4.99",
+//                            "premium_3m" to "3 Months - \$12.99",
+//                            "premium_6m" to "6 Months - \$19.99",
+//                            "premium_12m" to "12 Months - \$29.99 (Best Value)"
+//                        )
 
 //                        plans.forEach { (id, label) ->
 //
@@ -151,7 +160,9 @@ class SubscriptionActivity : ComponentActivity() {
 
                             },
                             enabled = selectedPlan != null,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
                         ) {
                             Text("Continue with Selected Plan")
                         }
@@ -165,7 +176,7 @@ class SubscriptionActivity : ComponentActivity() {
                         Text(
                             text = "Have a code?",
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
+                            style = MaterialTheme.typography.titleMedium,
                         )
 
                         OutlinedTextField(
@@ -179,11 +190,21 @@ class SubscriptionActivity : ComponentActivity() {
 
                         Button(
                             onClick = {
+
+                                if (user?.premium == true) {
+                                    showMessage("You're already premium")
+                                    return@Button
+                                }
+
+
                                 if (redeemCode == "p1m") {
 
                                     Log.d("ExpiredDate", getExpirationDate(30))
 
-                                    val newUser = user?.copy(isPremium = true, premiumDuration = getExpirationDate(30))
+                                    val newUser = user?.copy(
+                                        premium = true,
+                                        premiumDuration = getExpirationDate(30)
+                                    )
 
                                     if (newUser != null)
                                         userViewModel.saveUser(newUser)
@@ -199,34 +220,42 @@ class SubscriptionActivity : ComponentActivity() {
 
                                     startActivity(intent)
                                     finish()
+                                } else {
+                                    showMessage("Wrong code")
                                 }
                             },
                             enabled = redeemCode.isNotBlank(),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
                         ) {
                             Text("Redeem Code")
                         }
 
-                        Button(
-                            onClick = {
-                                if (user != null)
-                                    userViewModel.saveUser(user)
+                        if (!isSetting) {
+                            Button(
+                                onClick = {
+                                    if (user != null)
+                                        userViewModel.saveUser(user)
 
-                                val intent =
-                                    Intent(
-                                        applicationContext,
-                                        LoadingActivity::class.java
-                                    )
+                                    val intent =
+                                        Intent(
+                                            applicationContext,
+                                            LoadingActivity::class.java
+                                        )
 
-                                intent.putExtra("level", user?.vocabLevel)
-                                intent.putExtra("topic", user?.vocabTopic)
+                                    intent.putExtra("level", user?.vocabLevel)
+                                    intent.putExtra("topic", user?.vocabTopic)
 
-                                startActivity(intent)
-                                finish()
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Skip")
+                                    startActivity(intent)
+                                    finish()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp)
+                            ) {
+                                Text("Skip")
+                            }
                         }
                     }
                 }

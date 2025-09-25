@@ -9,8 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -47,14 +45,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.febriandev.vocary.utils.showMessage
 import com.febriandev.vocary.BaseActivity
 import com.febriandev.vocary.R
 import com.febriandev.vocary.ui.components.EmailTextField
 import com.febriandev.vocary.ui.components.PasswordTextField
 import com.febriandev.vocary.ui.onboard.DownloadActivity
-import com.febriandev.vocary.ui.onboard.OnboardActivity
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.utils.showMessage
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -153,7 +150,9 @@ class AuthActivity : BaseActivity() {
                             onClick = {
                                 authViewModel.signInWithEmail(email, password)
                             },
-                            modifier = Modifier.fillMaxWidth().height(48.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
                         ) {
                             Text("Login")
                         }
@@ -226,7 +225,9 @@ class AuthActivity : BaseActivity() {
             onClick = {
                 launcher.launch(googleSignInClient.signInIntent)
             },
-            modifier = Modifier.fillMaxWidth().height(48.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
         ) {
             Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Google")
             Spacer(Modifier.width(8.dp))

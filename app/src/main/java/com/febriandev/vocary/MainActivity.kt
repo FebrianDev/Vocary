@@ -191,7 +191,7 @@ class MainActivity : BaseActivity() {
                             if (!shouldCaptureScreenshot) {
                                 if (user != null) {
                                     VocabularyTopBar(
-                                        isPremium = user?.isPremium ?: false,
+                                        isPremium = user?.premium ?: false,
                                         name = user?.name ?: "",
                                         streakDays = 8,
                                         todayCount = dailyProgress?.progress ?: 0,
@@ -307,7 +307,7 @@ class MainActivity : BaseActivity() {
                                         tonalElevation = 4.dp,
                                         modifier = Modifier.clickable {
 
-                                            if (user?.isPremium == false) {
+                                            if (user?.premium == false) {
                                                 showMessage("You need to access premium!")
                                                 return@clickable
                                             }
@@ -389,7 +389,7 @@ class MainActivity : BaseActivity() {
                     }
                 }
 
-                ContentScreen(user?.isPremium ?: false, showContent, applicationContext) {
+                ContentScreen(user?.premium ?: false, showContent, applicationContext) {
                     showContent = false
                     if (level != Prefs[LEVEL, "Beginner (A1)"] || topic != Prefs[TOPIC, "General Vocabulary"]) {
                         //  showLoadingDialog = true
@@ -421,13 +421,14 @@ class MainActivity : BaseActivity() {
                 }
 //
                 ProfileScreen(
+                    user,
                     showProfile,
                     coroutineScope,
                     applicationContext,
                     this@MainActivity,
                     {
                         if (ConnHelper.hasConnection(applicationContext)) {
-                            syncData()
+                            syncData(user?.id.toString())
                         } else {
                             showMessage("No Internet Connection!")
                         }

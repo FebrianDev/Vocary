@@ -76,7 +76,7 @@ class VocabularyRepository @Inject constructor(private val vocabularyDao: Vocabu
         vocabularyDao.deleteGenerate()
         vocabularyDao.deleteSearch()
         vocabularyDao.deleteStreak()
-        vocabularyDao.deleteSearch()
+        vocabularyDao.deleteProgress()
     }
 
 }

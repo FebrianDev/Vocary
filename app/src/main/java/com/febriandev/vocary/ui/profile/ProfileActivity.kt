@@ -110,7 +110,7 @@ class ProfileActivity : ComponentActivity() {
                                 }
 
                                 FormField(
-                                    if (user?.isPremium == true) "Yes" else "No",
+                                    if (user?.premium == true) "Yes" else "No",
                                     "Premium",
                                     readOnly = true
                                 ) {

@@ -124,7 +124,7 @@ class RegisterActivity : BaseActivity() {
                         Image(
                             painter = painterResource(R.drawable.icon_image2),
                             contentDescription = "",
-                            modifier = Modifier.size(256.dp),
+                            modifier = Modifier.size(224.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                         )
 

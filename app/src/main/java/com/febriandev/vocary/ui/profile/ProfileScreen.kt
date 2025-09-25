@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Subscriptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.febriandev.vocary.data.db.entity.UserEntity
+import com.febriandev.vocary.ui.SubscriptionActivity
 import com.febriandev.vocary.ui.auth.AuthActivity
 import com.febriandev.vocary.ui.components.CustomAnimatedModalSheet
 import com.febriandev.vocary.ui.components.ProgressDialog
@@ -62,6 +65,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
+    userEntity: UserEntity?,
     showProfile: Boolean,
     scope: CoroutineScope,
     context: Context,
@@ -160,6 +164,19 @@ fun ProfileScreen(
                         title = "About",
                         modifier = Modifier.padding(vertical = 12.dp),
                         onClick = { isAbout = true }
+                    )
+
+                    SettingsRow(
+                        icon = Icons.Default.Subscriptions,
+                        title = "Subscription",
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        onClick = {
+                            val intent = Intent(context, SubscriptionActivity::class.java)
+                            intent.putExtra("isSetting", true)
+                            intent.putExtra("user", userEntity)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(intent)
+                        }
                     )
 
                     SettingsRow(

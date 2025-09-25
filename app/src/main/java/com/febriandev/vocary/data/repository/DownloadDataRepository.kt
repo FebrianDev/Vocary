@@ -2,13 +2,14 @@ package com.febriandev.vocary.data.repository
 
 import android.util.Log
 import com.febriandev.vocary.data.db.dao.DownloadDataDao
-import com.febriandev.vocary.data.db.entity.DailyProgressEntity
-import com.febriandev.vocary.data.db.entity.GameSessionEntity
-import com.febriandev.vocary.data.db.entity.GeneratedVocabEntity
-import com.febriandev.vocary.data.db.entity.SearchVocabularyEntity
-import com.febriandev.vocary.data.db.entity.StreakEntity
-import com.febriandev.vocary.data.db.entity.UserEntity
-import com.febriandev.vocary.data.db.entity.VocabularyEntity
+import com.febriandev.vocary.data.model.DailyProgressDto
+import com.febriandev.vocary.data.model.GameSessionDto
+import com.febriandev.vocary.data.model.GeneratedVocabDto
+import com.febriandev.vocary.data.model.SearchVocabularyDto
+import com.febriandev.vocary.data.model.StreakDto
+import com.febriandev.vocary.data.model.UserDto
+import com.febriandev.vocary.data.model.VocabularyDto
+import com.febriandev.vocary.data.model.toEntity
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -30,10 +31,13 @@ class DownloadDataRepository @Inject constructor(
                 .await()
 
             val vocabList = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(VocabularyEntity::class.java)?.copy(
+                Log.d("DownloadRepo", "Raw doc: ${doc.data}") // c
+                val data = doc.toObject(VocabularyDto::class.java)?.copy(
                     id = doc.id,
                     isSync = true
                 )
+
+                data?.toEntity()
             }
             dao.insertOrUpdateVocabularies(vocabList)
         } catch (e: Exception) {
@@ -51,10 +55,12 @@ class DownloadDataRepository @Inject constructor(
                 .await()
 
             val list = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(DailyProgressEntity::class.java)?.copy(
+                val data = doc.toObject(DailyProgressDto::class.java)?.copy(
                     date = doc.id,
                     isSync = true
                 )
+
+                data?.toEntity()
             }
             dao.insertOrUpdateDailyProgress(list)
         } catch (e: Exception) {
@@ -72,10 +78,12 @@ class DownloadDataRepository @Inject constructor(
                 .await()
 
             val list = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(GameSessionEntity::class.java)?.copy(
+                val data = doc.toObject(GameSessionDto::class.java)?.copy(
                     sessionId = doc.id,
                     isSync = true
                 )
+
+                data?.toEntity()
             }
             dao.insertOrUpdateGameSessions(list)
         } catch (e: Exception) {
@@ -88,15 +96,17 @@ class DownloadDataRepository @Inject constructor(
         try {
             val snapshot = firestore.collection("users")
                 .document(userId)
-                .collection("generate_vocab")
+                .collection("generated_vocab")
                 .get()
                 .await()
 
             val list = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(GeneratedVocabEntity::class.java)?.copy(
+                val data = doc.toObject(GeneratedVocabDto::class.java)?.copy(
                     id = doc.id.toInt(),
                     isSync = true
                 )
+
+                data?.toEntity()
             }
             dao.insertOrUpdateGeneratedVocabs(list)
         } catch (e: Exception) {
@@ -114,10 +124,12 @@ class DownloadDataRepository @Inject constructor(
                 .await()
 
             val list = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(SearchVocabularyEntity::class.java)?.copy(
+                val data = doc.toObject(SearchVocabularyDto::class.java)?.copy(
                     id = doc.id,
                     isSync = true
                 )
+
+                data?.toEntity()
             }
             dao.insertOrUpdateSearchVocabularies(list)
         } catch (e: Exception) {
@@ -130,15 +142,17 @@ class DownloadDataRepository @Inject constructor(
         try {
             val snapshot = firestore.collection("users")
                 .document(userId)
-                .collection("streak")
+                .collection("streaks")
                 .get()
                 .await()
 
             val list = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(StreakEntity::class.java)?.copy(
+                val data = doc.toObject(StreakDto::class.java)?.copy(
                     id = doc.id,
                     isSync = true
                 )
+
+                data?.toEntity()
             }
             dao.insertOrUpdateStreaks(list)
         } catch (e: Exception) {
@@ -154,11 +168,12 @@ class DownloadDataRepository @Inject constructor(
                 .get()
                 .await()
 
-            snapshot.toObject(UserEntity::class.java)?.copy(
+            snapshot.toObject(UserDto::class.java)?.copy(
                 id = snapshot.id,
                 isSync = true
             )?.let { user ->
-                dao.insertOrUpdateUser(user)
+                val data = user.toEntity()
+                dao.insertOrUpdateUser(data)
             }
         } catch (e: Exception) {
             Log.e("DownloadRepo", "Failed to fetch user", e)

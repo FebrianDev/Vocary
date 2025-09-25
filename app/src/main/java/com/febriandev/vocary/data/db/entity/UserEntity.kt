@@ -17,7 +17,7 @@ data class UserEntity(
     val learningGoal: String?, // tujuan belajar misalnya "TOEFL", "Daily Conversation"
     val vocabLevel: String?, // Beginner, Intermediate, Advanced
     val vocabTopic: String?, // misalnya "Business", "Travel"
-    val isPremium: Boolean,
+    val premium: Boolean,
     val premiumDuration: String?,
     val deviceName: String?,
     val deviceId: String?,

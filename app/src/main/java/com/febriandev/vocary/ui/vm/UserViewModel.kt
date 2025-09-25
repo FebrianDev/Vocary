@@ -30,9 +30,9 @@ class UserViewModel @Inject constructor(private val repository: UserRepository) 
     fun saveUser(user: UserEntity) {
         viewModelScope.launch {
             repository.insertOrUpdateUser(user)
-            repository.insertUser(user) { success, _ ->
-                _insertResult.value = success
-            }
+//            repository.insertUser(user) { success, _ ->
+//                _insertResult.value = success
+//            }
             _user.value = user
         }
     }
