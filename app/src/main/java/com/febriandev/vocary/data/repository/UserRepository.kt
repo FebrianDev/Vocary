@@ -60,6 +60,10 @@ class UserRepository @Inject constructor(
         userDao.updatePremiumFields(id, premium, premiumDuration)
     }
 
+    suspend fun updateXp(id: String, xp:Int){
+        userDao.updateXp(id, xp)
+    }
+
     suspend fun deleteUser(user: UserEntity) {
         userDao.deleteUser(user)
     }

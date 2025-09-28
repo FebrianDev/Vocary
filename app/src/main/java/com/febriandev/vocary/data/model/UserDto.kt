@@ -8,6 +8,7 @@ data class UserDto(
     val email: String = "",
     val photoUrl: String? = null,
     val age: Int? = null,
+    val xp:Int? = 0,
     val targetVocabulary: Int = 0,
     val learningGoal: String? = null,
     val vocabLevel: String? = null,

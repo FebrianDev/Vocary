@@ -26,6 +26,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.febriandev.vocary.domain.Question
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -60,13 +63,18 @@ class MiniGameActivity : ComponentActivity() {
 @Composable
 fun MiniGameScreen(
     viewModel: GameViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel(),
     defaultTotalQuestions: Int = 10,
     onFinish: () -> Unit
 ) {
     val state = viewModel.uiState
 
+    val user by userViewModel.user.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.startSession(defaultTotalQuestions)
+
+        userViewModel.getUser()
     }
 
     when {
@@ -78,20 +86,28 @@ fun MiniGameScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(state.error ?: "", style = MaterialTheme.typography.bodyLarge)
                 Spacer(Modifier.height(12.dp))
-                Button(onClick = { viewModel.startSession(defaultTotalQuestions) }) {
+                Button(onClick = { viewModel.startSession(defaultTotalQuestions) }, modifier = Modifier.height(48.dp)) {
                     Text("Play Again!")
                 }
             }
         }
 
-        state.finished -> SessionResultView(
-            score = state.score,
-            correct = state.correct,
-            wrong = state.wrong,
-            total = state.totalQuestions,
-            onRestart = { viewModel.startSession(defaultTotalQuestions) },
-            onFinish = onFinish
-        )
+        state.finished -> {
+
+            if (user != null) {
+                val newXp = (user?.xp ?: 0) + state.score
+                userViewModel.updateXp(user?.id.toString(), newXp)
+            }
+
+            SessionResultView(
+                score = state.score,
+                correct = state.correct,
+                wrong = state.wrong,
+                total = state.totalQuestions,
+                onRestart = { viewModel.startSession(defaultTotalQuestions) },
+                onFinish = onFinish
+            )
+        }
 
         else -> QuestionView(
             index = state.index,
@@ -154,7 +170,7 @@ private fun QuestionView(
 
             OutlinedButton(
                 onClick = { if (!answered) onSelect(option) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(48.dp),
                 border = border
             ) {
                 Box(
@@ -183,7 +199,7 @@ private fun QuestionView(
             )
             Spacer(Modifier.height(8.dp))
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(48.dp),
                 onClick = onNext,
                 enabled = answered
             ) { Text("Next") }
@@ -212,8 +228,18 @@ private fun SessionResultView(
             Text("Score: $score%", style = MaterialTheme.typography.titleMedium)
             Text("Correct: $correct • Wrong: $wrong • Total: $total")
             Spacer(Modifier.height(12.dp))
-            Button(onClick = onRestart, modifier = Modifier.fillMaxWidth()) { Text("Play Again") }
-            Button(onClick = onFinish, modifier = Modifier.fillMaxWidth()) { Text("Exit") }
+            Button(
+                onClick = onRestart,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+            ) { Text("Play Again") }
+            Button(
+                onClick = onFinish,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+            ) { Text("Exit") }
         }
     }
 }

@@ -54,6 +54,7 @@ import com.febriandev.vocary.utils.showMessage
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -80,6 +81,7 @@ class RegisterActivity : BaseActivity() {
                 LaunchedEffect(user) {
                     if (user != null) {
                    //     revenueCatViewModel.logIn(user?.uid.toString())
+                        OneSignal.login(user?.uid.toString())
                         val intent = Intent(applicationContext, OnboardActivity::class.java)
                         intent.putExtra("user", user)
                         startActivity(intent)

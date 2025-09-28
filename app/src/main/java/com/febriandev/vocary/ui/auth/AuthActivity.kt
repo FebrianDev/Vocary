@@ -57,6 +57,7 @@ import com.febriandev.vocary.utils.showMessage
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -83,6 +84,7 @@ class AuthActivity : BaseActivity() {
                 LaunchedEffect(user) {
                     if (user != null) {
                         val exists = authViewModel.getExistUser(user?.uid!!)
+                        OneSignal.login(user?.uid.toString())
                         if (exists) {
                             revenueCatViewModel.logIn(user?.uid.toString())
                             val intent = Intent(applicationContext, DownloadActivity::class.java)

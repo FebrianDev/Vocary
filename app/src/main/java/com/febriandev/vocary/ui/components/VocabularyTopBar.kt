@@ -10,11 +10,13 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +45,8 @@ fun VocabularyTopBar(
     name: String,
     streakDays: Int,
     todayCount: Int,
-    dailyGoal: Int
+    dailyGoal: Int,
+    xp: Int
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
@@ -53,32 +56,41 @@ fun VocabularyTopBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // LEFT: Name and Badge Icon
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (isPremium) {
-                Image(
-                    painterResource(R.drawable.ic_crown),
-                    contentDescription = "Crown",
-                    modifier = Modifier.size(42.dp)
+
+        Column(
+            horizontalAlignment = Alignment.Start
+        ) {
+            // LEFT: Name and Badge Icon
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isPremium) {
+                    Image(
+                        painterResource(R.drawable.ic_crown),
+                        contentDescription = "Crown",
+                        modifier = Modifier.size(42.dp)
+                    )
+                } else {
+                    Icon(
+                        imageVector = Lucide.Crown,
+                        contentDescription = "Crown",
+                        tint = colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.onSurface
+                    ),
+                    modifier = Modifier.fillMaxWidth(0.45f)
                 )
-            } else {
-                Icon(
-                    imageVector = Lucide.Crown,
-                    contentDescription = "Crown",
-                    tint = colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(28.dp) // lebih besar
-                )
-                Spacer(modifier = Modifier.width(8.dp))
             }
 
-            Text(
-                text = name,
-                style = MaterialTheme.typography.bodyLarge.copy( // lebih tegas
-                    fontWeight = FontWeight.Bold,
-                    color = colorScheme.onSurface
-                ),
-                modifier = Modifier.fillMaxWidth(0.45f)
-            )
+            Spacer(modifier = Modifier.height(4.dp))
+
+            XpPulse(xp)
         }
 
         // RIGHT: Streak and Today Progress
@@ -112,7 +124,6 @@ fun AnimatedProgressIndicator(
 ) {
     val targetProgress = (todayCount.toFloat() / dailyGoal.toFloat()).coerceIn(0f, 1f)
 
-    // animasi perubahan progress (smooth naik/turun)
     val animatedProgress by animateFloatAsState(
         targetValue = targetProgress,
         animationSpec = tween(
@@ -141,7 +152,7 @@ fun AnimatedProgressIndicator(
             modifier = Modifier
                 .width(100.dp)
                 .height(8.dp)
-                .scale(scale) // efek pulse
+                .scale(scale)
                 .clip(RoundedCornerShape(4.dp))
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -177,3 +188,29 @@ fun PulsingFireIcon() {
     )
 }
 
+@Composable
+fun XpPulse(xp: Int) {
+    val colorScheme = MaterialTheme.colorScheme
+
+    // Animasi scale pulse
+    val infiniteTransition = rememberInfiniteTransition()
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    Box(modifier = Modifier.padding(start = 16.dp)) {
+        Text(
+            text = "XP: $xp",
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.SemiBold,
+                color = colorScheme.primary
+            ),
+            modifier = Modifier.scale(scale)
+        )
+    }
+}

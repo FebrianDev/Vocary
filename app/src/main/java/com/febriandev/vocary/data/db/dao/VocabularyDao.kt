@@ -19,6 +19,17 @@ interface VocabularyDao {
     @Query("SELECT * FROM vocabulary WHERE word = :word LIMIT 1")
     suspend fun getVocabularyByWord(word: String): VocabularyEntity?
 
+    @Query("""
+    SELECT DISTINCT * 
+    FROM vocabulary 
+    WHERE
+      isOwnWord = 0 
+
+    ORDER BY id DESC 
+    LIMIT 1
+""")
+    fun getVocab(): VocabularyEntity?
+
     @Query(
         """
     SELECT DISTINCT * 

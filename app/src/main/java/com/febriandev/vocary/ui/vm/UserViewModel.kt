@@ -30,6 +30,12 @@ class UserViewModel @Inject constructor(private val repository: UserRepository) 
         return repository.getCurrentUser()
     }
 
+    fun updateXp(id: String, xp:Int){
+        viewModelScope.launch {
+            repository.updateXp(id, xp)
+        }
+    }
+
     fun getUser() = viewModelScope.launch {
         _user.value = repository.getCurrentUser()
     }

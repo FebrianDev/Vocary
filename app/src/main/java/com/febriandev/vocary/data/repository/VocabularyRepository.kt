@@ -70,6 +70,8 @@ class VocabularyRepository @Inject constructor(private val vocabularyDao: Vocabu
         return vocabularyDao.getVocabularyByWord(word)
     }
 
+    fun getVocab(): Vocabulary? = vocabularyDao.getVocab()?.toVocabulary()
+
     suspend fun deleteAllData() {
         vocabularyDao.deleteVocabulary()
         vocabularyDao.deleteGame()

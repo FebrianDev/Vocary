@@ -21,6 +21,10 @@ interface UserDao {
     @Query("UPDATE user SET premium = :premium, premiumDuration = :premiumDuration WHERE id = :id")
     suspend fun updatePremiumFields(id: String, premium: Boolean, premiumDuration: String?)
 
+    @Query("UPDATE user SET xp = :xp WHERE id = :id")
+    suspend fun updateXp(id: String, xp:Int)
+
+
     @Delete
     suspend fun deleteUser(user: UserEntity)
 

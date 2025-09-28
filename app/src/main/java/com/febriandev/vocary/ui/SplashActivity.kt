@@ -51,7 +51,7 @@ class SplashActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val step = Prefs[STEP_SCREEN, 2]
+        val step = Prefs[STEP_SCREEN, 0]
 
         setContent {
             VocaryTheme {

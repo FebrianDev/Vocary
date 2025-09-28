@@ -86,6 +86,7 @@ import com.febriandev.vocary.utils.ScreenshotController
 import com.febriandev.vocary.utils.showMessage
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -121,12 +122,6 @@ class MainActivity : BaseActivity() {
                                 user.id
                             )
                     }
-
-//                    startGenerateProcess(
-//                        "Common English",
-//                        "Intermediate"
-//                    )
-
 
                     progressViewModel.getProgress()
                     streakViewModel.markStreak(OPEN_APP, true)
@@ -211,7 +206,8 @@ class MainActivity : BaseActivity() {
                                         name = user?.name ?: "",
                                         streakDays = 8,
                                         todayCount = dailyProgress?.progress ?: 0,
-                                        dailyGoal = user?.targetVocabulary ?: 100
+                                        dailyGoal = user?.targetVocabulary ?: 100,
+                                        xp = user?.xp ?: 0
                                     )
                                 }
                             }
@@ -233,12 +229,20 @@ class MainActivity : BaseActivity() {
                                 },
 
                                 onProgress = { id ->
-                                    progressViewModel.onVocabularyKnown(id)
+                                    progressViewModel.onVocabularyKnown(
+                                        id,
+                                        user?.targetVocabulary ?: 0,
+                                        user?.id ?: "",
+                                        user?.xp ?: 0
+                                    ){
+                                        userViewModel.getUser()
+                                    }
                                     if (dailyProgress != null && dailyProgress?.progress!! >= (user?.targetVocabulary
                                             ?: 0) - 1
                                     ) {
                                         streakViewModel.markStreak(DAILY_GOAL, true)
                                     }
+
                                 },
                                 active = true,
                                 pagerState,
@@ -468,6 +472,7 @@ class MainActivity : BaseActivity() {
                         vocabViewModel.deleteAllData()
                         authViewModel.signOut(gso, applicationContext)
                         revenueCatViewModel.logOut()
+                        OneSignal.logout()
                     }) {
                     userViewModel.getUser()
                     showProfile = false

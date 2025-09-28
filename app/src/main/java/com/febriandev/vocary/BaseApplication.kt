@@ -4,7 +4,13 @@ import android.app.Application
 import android.content.Intent
 import android.util.Log
 import androidx.work.Configuration
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.febriandev.vocary.utils.Prefs
+import com.febriandev.vocary.worker.NotificationWorker
 import com.febriandev.vocary.worker.WorkFactory
 import com.onesignal.OneSignal
 import com.onesignal.notifications.INotificationClickEvent
@@ -12,6 +18,7 @@ import com.onesignal.notifications.INotificationClickListener
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import dagger.hilt.android.HiltAndroidApp
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -32,13 +39,8 @@ class BaseApplication : Application(), Configuration.Provider {
 
         val oneSignalAppId = "0140f446-57b5-4908-a124-5b6f55e0499e"
 
-        // Init OneSignal v5
         OneSignal.initWithContext(this, oneSignalAppId)
 
-        // Debug log
-        // OneSignal.Debug.logLevel = Log.VERBOSE
-
-        // Listener kalau notif dibuka user
         OneSignal.Notifications.addClickListener(object : INotificationClickListener {
             override fun onClick(event: INotificationClickEvent) {
                 val notification = event.notification
@@ -59,22 +61,22 @@ class BaseApplication : Application(), Configuration.Provider {
         super.onTrimMemory(level)
         if (level == TRIM_MEMORY_UI_HIDDEN) {
             // App masuk background
-//            val constraints = Constraints.Builder()
-//                .setRequiresBatteryNotLow(true)
-//                .setRequiresDeviceIdle(false) // ubah true jika kamu ingin hanya saat idle
-//                .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-//                .build()
-//
-//            val request = PeriodicWorkRequestBuilder<NotificationWorker>(4, TimeUnit.HOURS)
-//                .setConstraints(constraints)
-//                .setInitialDelay(4, TimeUnit.HOURS)
-//                .build()
-//
-//            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-//                "daily_notification",
-//                ExistingPeriodicWorkPolicy.UPDATE, // agar tidak dijalankan berulang
-//                request
-//            )
+            val constraints = Constraints.Builder()
+                .setRequiresBatteryNotLow(true)
+                .setRequiresDeviceIdle(false) // ubah true jika kamu ingin hanya saat idle
+                .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+                .build()
+
+            val request = PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .setInitialDelay(1, TimeUnit.MINUTES)
+                .build()
+
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "daily_notification",
+                ExistingPeriodicWorkPolicy.UPDATE, // agar tidak dijalankan berulang
+                request
+            )
         }
     }
 

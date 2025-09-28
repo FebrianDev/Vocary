@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.febriandev.vocary.data.db.entity.DailyProgressEntity
 import com.febriandev.vocary.data.repository.DailyProgressRepository
+import com.febriandev.vocary.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProgressViewModel @Inject constructor(
-    private val dailyProgressRepository: DailyProgressRepository
+    private val dailyProgressRepository: DailyProgressRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
 //    fun onAppOpen() = viewModelScope.launch {
@@ -40,39 +42,52 @@ class ProgressViewModel @Inject constructor(
     val dailyProgress: StateFlow<DailyProgressEntity?> = _dailyProgress
 
 
-    fun onVocabularyKnown(vocabId: String, target: Int = 10) = viewModelScope.launch {
-        val today = todayDate()
-        val progress = dailyProgressRepository.getProgress(today)
+    fun onVocabularyKnown(
+        vocabId: String,
+        target: Int,
+        userId: String,
+        xp: Int,
+        updateUser: () -> Unit
+    ) =
+        viewModelScope.launch {
+            val today = todayDate()
+            val progress = dailyProgressRepository.getProgress(today)
 
-        if (progress != null) {
+            if (progress != null) {
 
-            val alreadyAdded = progress.listVocabulary.contains(vocabId)
+                val alreadyAdded = progress.listVocabulary.contains(vocabId)
 
-            val updatedProgress = if (!alreadyAdded) {
-                progress.copy(
-                    progress = progress.progress + 1,
-                    isGoalAchieved = (progress.progress + 1) >= target,
-                    listVocabulary = progress.listVocabulary + vocabId, // tambahkan vocab baru
-                    updatedAt = System.currentTimeMillis()
-                )
+                val updatedProgress = if (!alreadyAdded) {
+                    // val currentUser = userRepository.getCurrentUser()
+                    val newXp = xp + 10
+                    userRepository.updateXp(userId, newXp)
+                    updateUser.invoke()
+
+                    progress.copy(
+                        progress = progress.progress + 1,
+                        isGoalAchieved = (progress.progress + 1) >= target,
+                        listVocabulary = progress.listVocabulary + vocabId,
+                        updatedAt = System.currentTimeMillis()
+                    )
+
+                } else {
+                    progress
+                }
+
+                dailyProgressRepository.update(updatedProgress)
+                getProgress()
+
             } else {
-                progress
+                dailyProgressRepository.insert(
+                    DailyProgressEntity(
+                        today,
+                        1,
+                        listVocabulary = listOf(vocabId)
+                    ),
+                )
+                getProgress()
             }
-
-            dailyProgressRepository.update(updatedProgress)
-            getProgress()
-
-        } else {
-            dailyProgressRepository.insert(
-                DailyProgressEntity(
-                    today,
-                    1,
-                    listVocabulary = listOf(vocabId)
-                ),
-            )
-            getProgress()
         }
-    }
 
     fun getProgress() = viewModelScope.launch {
         val today = todayDate()
