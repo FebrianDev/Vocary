@@ -182,10 +182,10 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
         }
     }
 
-    fun deleteAllData() {
-        viewModelScope.launch {
+    suspend fun deleteAllData() {
+        //viewModelScope.launch {
             repository.deleteAllData()
-        }
+        //}
     }
 
 }

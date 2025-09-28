@@ -49,6 +49,7 @@ import com.febriandev.vocary.ui.components.EmailTextField
 import com.febriandev.vocary.ui.components.PasswordTextField
 import com.febriandev.vocary.ui.onboard.OnboardActivity
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.RevenueCatViewModel
 import com.febriandev.vocary.utils.showMessage
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -59,6 +60,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class RegisterActivity : BaseActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
+    private val revenueCatViewModel: RevenueCatViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +70,7 @@ class RegisterActivity : BaseActivity() {
             VocaryTheme {
 
                 val user by authViewModel.user.collectAsState()
+                val loading by authViewModel.loading.collectAsState()
 
                 var email by remember { mutableStateOf("") }
                 var password by remember { mutableStateOf("") }
@@ -76,9 +79,11 @@ class RegisterActivity : BaseActivity() {
 
                 LaunchedEffect(user) {
                     if (user != null) {
+                   //     revenueCatViewModel.logIn(user?.uid.toString())
                         val intent = Intent(applicationContext, OnboardActivity::class.java)
                         intent.putExtra("user", user)
                         startActivity(intent)
+                        finish()
                         Log.d("AppUser", user.toString())
                     }
                 }
@@ -114,7 +119,7 @@ class RegisterActivity : BaseActivity() {
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Boost your vocabulary and make learning fun 🚀",
+                            text = "Boost your vocabulary and make learning fun",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
@@ -147,8 +152,17 @@ class RegisterActivity : BaseActivity() {
                         Button(
                             onClick = {
                                 authViewModel.registerWithEmail(email, password)
+
+//                                val intent = Intent(applicationContext, OnboardActivity::class.java)
+//                                intent.putExtra("email", email)
+//                                intent.putExtra("password", password)
+//                                startActivity(intent)
+//                                Log.d("AppUser", user.toString())
                             },
-                            modifier = Modifier.fillMaxWidth().height(48.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                            enabled = !loading
                         ) {
                             Text("Register")
                         }
@@ -156,6 +170,7 @@ class RegisterActivity : BaseActivity() {
                         TextButton(onClick = {
                             val intent = Intent(applicationContext, AuthActivity::class.java)
                             startActivity(intent)
+                            finish()
                         }) {
                             Text("Already have an account? Login")
                         }

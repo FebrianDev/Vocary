@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import com.composables.icons.lucide.GraduationCap
 import com.composables.icons.lucide.Lucide
 import com.febriandev.vocary.domain.Vocabulary
+import com.febriandev.vocary.ui.auth.AuthViewModel
 import com.febriandev.vocary.ui.components.LoadingDialogContent
 import com.febriandev.vocary.ui.components.VocabularyInfo
 import com.febriandev.vocary.ui.components.VocabularyNote
@@ -71,6 +72,7 @@ import com.febriandev.vocary.ui.progress.ProgressViewModel
 import com.febriandev.vocary.ui.streaks.StreakScreen
 import com.febriandev.vocary.ui.streaks.StreakViewModel
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.RevenueCatViewModel
 import com.febriandev.vocary.ui.vm.UserViewModel
 import com.febriandev.vocary.ui.vm.VocabularyViewModel
 import com.febriandev.vocary.utils.ConnHelper
@@ -83,6 +85,7 @@ import com.febriandev.vocary.utils.ScreenshotBox
 import com.febriandev.vocary.utils.ScreenshotController
 import com.febriandev.vocary.utils.showMessage
 import com.google.accompanist.pager.rememberPagerState
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -94,6 +97,9 @@ class MainActivity : BaseActivity() {
     private val progressViewModel: ProgressViewModel by viewModels()
     private val streakViewModel: StreakViewModel by viewModels()
 
+    private val authViewModel: AuthViewModel by viewModels()
+    private val revenueCatViewModel: RevenueCatViewModel by viewModels()
+
     @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,17 +108,19 @@ class MainActivity : BaseActivity() {
         setContent {
             VocaryTheme {
 
-                val PROGRESS_MAX = 10
+                //  val PROGRESS_MAX = 10
 
                 LaunchedEffect(Unit) {
                     userViewModel.getUser()
                     val user = userViewModel.getCurrentUser()
-//                    if (user != null) {
-//                        if (vocabViewModel.getCountNewOrNope() <= 15) startGenerateProcess(
-//                            user.vocabTopic ?: "Common English",
-//                            user.vocabLevel ?: "Intermediate"
-//                        )
-//                    }
+                    if (user != null) {
+                        if (vocabViewModel.getCountNewOrNope() <= 15)
+                            startGenerateProcess(
+                                user.vocabTopic ?: "Common English",
+                                user.vocabLevel ?: "Intermediate",
+                                user.id
+                            )
+                    }
 
 //                    startGenerateProcess(
 //                        "Common English",
@@ -165,6 +173,14 @@ class MainActivity : BaseActivity() {
                     }
                 }
 
+                LaunchedEffect(user?.id) {
+                    level = user?.vocabLevel ?: "Intermediate"
+                    topic = user?.vocabTopic ?: "English Everyday Life"
+
+                    if (user != null && user?.isRevenueCat == true) {
+                        userViewModel.syncPremiumStatus(user!!)
+                    }
+                }
 
                 Scaffold(
                     modifier = Modifier
@@ -218,7 +234,9 @@ class MainActivity : BaseActivity() {
 
                                 onProgress = { id ->
                                     progressViewModel.onVocabularyKnown(id)
-                                    if (dailyProgress != null && dailyProgress?.progress!! >= PROGRESS_MAX - 1) {
+                                    if (dailyProgress != null && dailyProgress?.progress!! >= (user?.targetVocabulary
+                                            ?: 0) - 1
+                                    ) {
                                         streakViewModel.markStreak(DAILY_GOAL, true)
                                     }
                                 },
@@ -250,7 +268,8 @@ class MainActivity : BaseActivity() {
                                                 if (user != null) {
                                                     startGenerateProcess(
                                                         user.vocabTopic ?: "Common English",
-                                                        user.vocabLevel ?: "Intermediate"
+                                                        user.vocabLevel ?: "Intermediate",
+                                                        user.id
                                                     )
                                                     delay(13000)
                                                     vocabViewModel.getAllVocabulary()
@@ -391,33 +410,38 @@ class MainActivity : BaseActivity() {
 
                 ContentScreen(user?.premium ?: false, showContent, applicationContext) {
                     showContent = false
-                    if (level != Prefs[LEVEL, "Beginner (A1)"] || topic != Prefs[TOPIC, "General Vocabulary"]) {
-                        //  showLoadingDialog = true
-                        level = Prefs[LEVEL, "Beginner (A1)"]
-                        topic = Prefs[TOPIC, "General Vocabulary"]
+                    userViewModel.getUser()
+//                    if (level != user?.vocabLevel || topic != user?.vocabTopic) {
+//                        //  showLoadingDialog = true
+//                        level = user?.vocabLevel ?: "Intermediate"
+//                        topic = user?.vocabTopic ?: "Every day life"
 
 //                            vocabViewModel.startGenerateProcess(
 //                                Prefs[TOPIC, "General Vocabulary"],
 //                                Prefs[LEVEL, "Beginner (A1)"]
 //                            )
 
-                        /*  coroutineScope.launch {
+                    coroutineScope.launch {
 
-                              val user = userViewModel.getCurrentUser()
-                              if (user != null && level != user.vocabLevel || topic != user?.vocabTopic) {
-//                                    startGenerateProcess(
-//                                        user?.vocabTopic ?: "Common English",
-//                                        user?.vocabLevel ?: "Intermediate"
-//                                    )
+                        val user = userViewModel.getCurrentUser()
+                        if (user != null && level != user.vocabLevel || topic != user?.vocabTopic) {
+                            showLoadingDialog = true
+                            level = user?.vocabLevel ?: "Intermediate"
+                            topic = user?.vocabTopic ?: "Common English"
+                            startGenerateProcess(
+                                user?.vocabTopic ?: "Common English",
+                                user?.vocabLevel ?: "Intermediate",
+                                user?.id.toString()
+                            )
 
-                                  delay(13000) // Simulasi proses generate 10 detik
-                                  vocabViewModel.getAllVocabulary()
-                                  delay(2000)
-                                  showLoadingDialog = false
-                                  pagerState.scrollToPage(0) // Kembali ke halaman awal
-                              }
-                          }*/
+                            delay(13000) // Simulasi proses generate 10 detik
+                            vocabViewModel.getAllVocabulary()
+                            delay(2000)
+                            showLoadingDialog = false
+                            pagerState.scrollToPage(0) // Kembali ke halaman awal
+                        }
                     }
+                    //    }
                 }
 //
                 ProfileScreen(
@@ -435,8 +459,17 @@ class MainActivity : BaseActivity() {
 
                     },
                     {
+
+                        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken(getString(R.string.default_web_client_id))
+                            .requestEmail()
+                            .build()
+
                         vocabViewModel.deleteAllData()
+                        authViewModel.signOut(gso, applicationContext)
+                        revenueCatViewModel.logOut()
                     }) {
+                    userViewModel.getUser()
                     showProfile = false
                 }
 

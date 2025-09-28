@@ -24,6 +24,9 @@ class DownloadDataRepository @Inject constructor(
     // ---------------- Vocabulary ----------------
     suspend fun getAndSaveVocabularies(userId: String) = withContext(Dispatchers.IO) {
         try {
+
+            dao
+
             val snapshot = firestore.collection("users")
                 .document(userId)
                 .collection("vocabularies")
@@ -39,6 +42,7 @@ class DownloadDataRepository @Inject constructor(
 
                 data?.toEntity()
             }
+            dao.deleteVocabularyIsSync()
             dao.insertOrUpdateVocabularies(vocabList)
         } catch (e: Exception) {
             Log.e("DownloadRepo", "Failed to fetch vocabularies", e)
@@ -62,6 +66,7 @@ class DownloadDataRepository @Inject constructor(
 
                 data?.toEntity()
             }
+            dao.deleteDailyProgressIsSync()
             dao.insertOrUpdateDailyProgress(list)
         } catch (e: Exception) {
             Log.e("DownloadRepo", "Failed to fetch daily progress", e)
@@ -85,6 +90,7 @@ class DownloadDataRepository @Inject constructor(
 
                 data?.toEntity()
             }
+            dao.deleteGameSessionsIsSync()
             dao.insertOrUpdateGameSessions(list)
         } catch (e: Exception) {
             Log.e("DownloadRepo", "Failed to fetch game sessions", e)
@@ -108,6 +114,7 @@ class DownloadDataRepository @Inject constructor(
 
                 data?.toEntity()
             }
+            dao.deleteGeneratedVocabsIsSync()
             dao.insertOrUpdateGeneratedVocabs(list)
         } catch (e: Exception) {
             Log.e("DownloadRepo", "Failed to fetch generated vocabs", e)
@@ -131,6 +138,7 @@ class DownloadDataRepository @Inject constructor(
 
                 data?.toEntity()
             }
+            dao.deleteSearchVocabulariesIsSync()
             dao.insertOrUpdateSearchVocabularies(list)
         } catch (e: Exception) {
             Log.e("DownloadRepo", "Failed to fetch search vocabularies", e)
@@ -154,6 +162,8 @@ class DownloadDataRepository @Inject constructor(
 
                 data?.toEntity()
             }
+
+            dao.deleteStreaksIsSync()
             dao.insertOrUpdateStreaks(list)
         } catch (e: Exception) {
             Log.e("DownloadRepo", "Failed to fetch streaks", e)
@@ -165,15 +175,22 @@ class DownloadDataRepository @Inject constructor(
         try {
             val snapshot = firestore.collection("users")
                 .document(userId)
+                .collection("users")
                 .get()
                 .await()
 
-            snapshot.toObject(UserDto::class.java)?.copy(
-                id = snapshot.id,
-                isSync = true
-            )?.let { user ->
-                val data = user.toEntity()
-                dao.insertOrUpdateUser(data)
+            val list = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(UserDto::class.java)?.copy(
+                    id = doc.id,
+                    isSync = true
+                )?.toEntity()
+            }
+
+            if (list.isNotEmpty()) {
+                dao.deleteUserIsSync()
+                dao.insertOrUpdateUser(list.first()) // ambil yang pertama, kalau cuma 1 user
+            } else {
+                Log.w("DownloadRepo", "No user found in sub-collection for $userId")
             }
         } catch (e: Exception) {
             Log.e("DownloadRepo", "Failed to fetch user", e)

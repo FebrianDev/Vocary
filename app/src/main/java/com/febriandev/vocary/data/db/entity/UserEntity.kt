@@ -13,12 +13,14 @@ data class UserEntity(
     val email: String,
     val photoUrl: String?,
     val age: Int?,
-    val targetVocabulary: Int, // target harian
-    val learningGoal: String?, // tujuan belajar misalnya "TOEFL", "Daily Conversation"
-    val vocabLevel: String?, // Beginner, Intermediate, Advanced
-    val vocabTopic: String?, // misalnya "Business", "Travel"
+    val xp:Int? = 0,
+    val targetVocabulary: Int,
+    val learningGoal: String?,
+    val vocabLevel: String?,
+    val vocabTopic: String?,
     val premium: Boolean,
     val premiumDuration: String?,
+    val isRevenueCat: Boolean = false,
     val deviceName: String?,
     val deviceId: String?,
     val isSync: Boolean = false,

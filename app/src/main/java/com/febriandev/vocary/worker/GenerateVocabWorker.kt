@@ -20,11 +20,12 @@ class GenerateVocabWorker @AssistedInject constructor(
         Log.d("ProcessVocabWorker", "StartGenerate")
         val topic = inputData.getString("topic") ?: return Result.failure()
         val level = inputData.getString("level") ?: return Result.failure()
+        val userId = inputData.getString("userId") ?: return Result.failure()
 
         Log.d("ProcessVocabWorker", "Start: topic=$topic, level=$level")
 
         return try {
-            repository.generateVocabulary(topic, level)
+            repository.generateVocabulary(topic, level, userId)
             Log.d("ProcessVocabWorker", "SUCCESS")
             Result.success()
         } catch (e: Exception) {

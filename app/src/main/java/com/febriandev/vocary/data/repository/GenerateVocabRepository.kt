@@ -26,13 +26,20 @@ class GenerateVocabRepository @Inject constructor(
     private val vocabularyDao: VocabularyDao
 ) {
 
-    suspend fun generateVocabulary(topic: String, level: String) {
+    suspend fun generateVocabulary(topic: String, level: String, userId: String) {
         val prompt = """
-           You are an English teacher AI.
+         You are an English teacher AI.
 
-            Generate **exactly 20 unique** English vocabulary words related to **"$topic"**, suitable for **$level** level learners.
-
-            ⚠️ Return only a **pure JSON array** of **lowercase words**, no explanations, no numbering.
+        Generate **exactly 20 unique** English vocabulary words related to **"$topic"**, 
+        suitable for **$level** level learners (userId = $userId).
+        
+        ⚠️ Rules:
+        - Return only a **pure JSON array** of **lowercase words** (no explanations, no numbering).
+        - Avoid duplicates from earlier generations for this user.
+        - Prioritize variety: include a mix of **common, intermediate, and less common words**.
+        - Cover different parts of speech (nouns, verbs, adjectives, expressions) when possible.
+        - If the topic is broad, do not stick to only the most obvious words.
+        - If common words are likely already used, choose fresher, rarer alternatives.
             
             ✅ Example output:
             ["apple", "banana", "grape", "orange", "melon"]
@@ -54,6 +61,14 @@ class GenerateVocabRepository @Inject constructor(
     suspend fun processVocabulary() {
         generateDao.getPendingVocab().forEach { vocab ->
             try {
+
+                val existing = vocabularyDao.getVocabularyByWord(vocab.word)
+                if (existing != null) {
+                    // sudah ada → tandai sebagai processed, skip API call
+                    generateDao.updateVocabDetail(vocab.word)
+                    return@forEach
+                }
+
                 val dictionaryResponse = dictionaryApi.getWordDefinition(vocab.word)
                 val wordsResponse = wordsApiService.getWordInfo(
                     word = vocab.word,
@@ -112,7 +127,7 @@ class GenerateVocabRepository @Inject constructor(
             return VocabularyEntity(
                 id = generateRandomId(),
                 word = wordsApi.word,
-                pronunciation = if(wordsApi.pronunciation == null) "" else wordsApi.pronunciation.all,
+                pronunciation = if (wordsApi.pronunciation == null) "" else wordsApi.pronunciation.all,
                 phonetics = phonetics.map { it.toEntity() },
                 definitions = wordsApiDefinitions,
                 sourceUrls = sourceUrls

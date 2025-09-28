@@ -38,6 +38,8 @@ import com.febriandev.vocary.MainActivity
 import com.febriandev.vocary.ui.theme.ThemeMode
 import com.febriandev.vocary.ui.theme.ThemeState
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.utils.Constant.STEP_SCREEN
+import com.febriandev.vocary.utils.Prefs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 
@@ -47,14 +49,18 @@ class LoadingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        Prefs[STEP_SCREEN] = 3
         val level = intent.getStringExtra("level") ?: "Intermediate"
         val topic = intent.getStringExtra("topic") ?: "Everyday Life"
+        val userId = intent.getStringExtra("userId") ?: ""
 
         setContent {
             VocaryTheme {
 
-                LoadingScreen(level, topic) {
+                LoadingScreen(level, topic, userId) {
+
+                    syncData(userId)
+
                     val intent = Intent(applicationContext, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)
@@ -66,7 +72,7 @@ class LoadingActivity : BaseActivity() {
     }
 
     @Composable
-    fun LoadingScreen(level: String, topic: String, onNavigateToHome: () -> Unit) {
+    fun LoadingScreen(level: String, topic: String, userId: String, onNavigateToHome: () -> Unit) {
 
         val themeMode by ThemeState.themeMode
         val isSystemDark = isSystemInDarkTheme()
@@ -97,7 +103,8 @@ class LoadingActivity : BaseActivity() {
 
             startGenerateProcess(
                 topic,
-                level
+                level,
+                userId
             )
 
             while (currentTextIndex <= 3) {

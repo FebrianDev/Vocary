@@ -14,6 +14,7 @@ data class UserDto(
     val vocabTopic: String? = null,
     val premium: Boolean = false,
     val premiumDuration: String? = null,
+    val isRevenueCat: Boolean = false,
     val deviceName: String? = null,
     val deviceId: String? = null,
     val isSync: Boolean = false,

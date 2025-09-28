@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -34,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,10 +53,13 @@ import com.febriandev.vocary.ui.onboard.LoadingActivity
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.febriandev.vocary.ui.vm.RevenueCatViewModel
 import com.febriandev.vocary.ui.vm.UserViewModel
+import com.febriandev.vocary.utils.Constant.STEP_SCREEN
+import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.utils.getExpirationDate
 import com.febriandev.vocary.utils.showMessage
 import com.revenuecat.purchases.Package
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class SubscriptionActivity : ComponentActivity() {
@@ -71,6 +76,8 @@ class SubscriptionActivity : ComponentActivity() {
         val user = intent.getParcelableExtra<UserEntity>("user")
         val isSetting = intent.getBooleanExtra("isSetting", false)
 
+        if (!isSetting) Prefs[STEP_SCREEN] = 2
+
         setContent {
             VocaryTheme {
                 var selectedPlan by remember { mutableStateOf<String?>(null) }
@@ -79,6 +86,44 @@ class SubscriptionActivity : ComponentActivity() {
 
                 val offerings by revenueCatViewModel.offerings.collectAsState()
                 val premium by revenueCatViewModel.isPremium.collectAsState()
+                val premiumExpirationDate by revenueCatViewModel.premiumExpirationDate.collectAsState()
+
+                val isLoading by revenueCatViewModel.isLoading.collectAsState()
+
+                LaunchedEffect(premium) {
+                    if (premium && user != null) {
+
+                        val newUser = user.copy(
+                            premium = true,
+                            premiumDuration = premiumExpirationDate,
+                            isRevenueCat = true
+                        )
+                        userViewModel.saveUser(newUser)
+                        showMessage("Premium activated!")
+
+                        if (!isSetting) {
+                            val intent =
+                                Intent(
+                                    applicationContext,
+                                    LoadingActivity::class.java
+                                )
+                                    .apply {
+                                        putExtra(
+                                            "level",
+                                            user.vocabLevel ?: "Intermediate"
+                                        )
+                                        putExtra(
+                                            "topic",
+                                            user.vocabTopic ?: "Everyday Life"
+                                        )
+                                        putExtra("userId", user.id)
+                                    }
+                            startActivity(intent)
+                            finish()
+                        }
+
+                    }
+                }
 
                 Scaffold(
                     modifier = Modifier
@@ -91,7 +136,6 @@ class SubscriptionActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(24.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        //    horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
 
@@ -104,17 +148,6 @@ class SubscriptionActivity : ComponentActivity() {
                                 style = MaterialTheme.typography.headlineMedium,
                             )
                         }
-
-//                        val plans = listOf(
-//                            "premium_1m" to "1 Month - \$4.99",
-//                            "premium_3m" to "3 Months - \$12.99",
-//                            "premium_6m" to "6 Months - \$19.99",
-//                            "premium_12m" to "12 Months - \$29.99 (Best Value)"
-//                        )
-
-//                        plans.forEach { (id, label) ->
-//
-//                        }
 
                         when {
                             offerings == null -> {
@@ -136,6 +169,10 @@ class SubscriptionActivity : ComponentActivity() {
 
                             else -> {
                                 offerings?.all?.get("default")?.availablePackages?.forEach { pkg ->
+                                    Log.d(
+                                        "RevenueCat",
+                                        "Available package id=${pkg.product.id}, title=${pkg.product.title}"
+                                    )
                                     SubscriptionOption(
                                         text = pkg.product.title,
                                         isSelected = selectedPlan == pkg.product.id,
@@ -151,11 +188,17 @@ class SubscriptionActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 if (pkgPlan != null) {
+                                    showMessage("Processing purchase...")
                                     revenueCatViewModel.purchase(
                                         this@SubscriptionActivity,
-                                        pkgPlan!!
+                                        pkgPlan!!,
+                                        onActivated = {
+
+                                        },
+                                        onTimeout = {
+                                            showMessage("Activation is taking longer than expected. Please try again or restore purchases.")
+                                        }
                                     )
-                                    showMessage("Processing purchase...")
                                 }
 
                             },
@@ -164,7 +207,15 @@ class SubscriptionActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .height(48.dp)
                         ) {
-                            Text("Continue with Selected Plan")
+                            if (isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            } else {
+                                Text("Continue with Selected Plan")
+                            }
                         }
 
                         HorizontalDivider(
@@ -196,30 +247,38 @@ class SubscriptionActivity : ComponentActivity() {
                                     return@Button
                                 }
 
-
                                 if (redeemCode == "p1m") {
 
                                     Log.d("ExpiredDate", getExpirationDate(30))
 
                                     val newUser = user?.copy(
                                         premium = true,
-                                        premiumDuration = getExpirationDate(30)
+                                        premiumDuration = getExpirationDate(30),
+                                        isRevenueCat = false
                                     )
 
                                     if (newUser != null)
                                         userViewModel.saveUser(newUser)
 
-                                    val intent =
-                                        Intent(
-                                            applicationContext,
-                                            LoadingActivity::class.java
+                                    if (isSetting) {
+                                        finish()
+                                    } else {
+                                        val intent =
+                                            Intent(
+                                                applicationContext,
+                                                LoadingActivity::class.java
+                                            )
+
+                                        intent.putExtra("level", user?.vocabLevel ?: "Intermediate")
+                                        intent.putExtra(
+                                            "topic",
+                                            user?.vocabTopic ?: "Everyday Life"
                                         )
+                                        intent.putExtra("userId", user?.id ?: "")
 
-                                    //    intent.putExtra("level", level)
-                                    //   intent.putExtra("topic", selectedTopic?.displayName)
-
-                                    startActivity(intent)
-                                    finish()
+                                        startActivity(intent)
+                                        finish()
+                                    }
                                 } else {
                                     showMessage("Wrong code")
                                 }
@@ -244,8 +303,9 @@ class SubscriptionActivity : ComponentActivity() {
                                             LoadingActivity::class.java
                                         )
 
-                                    intent.putExtra("level", user?.vocabLevel)
-                                    intent.putExtra("topic", user?.vocabTopic)
+                                    intent.putExtra("level", user?.vocabLevel ?: "Intermediate")
+                                    intent.putExtra("topic", user?.vocabTopic ?: "Everyday Life")
+                                    intent.putExtra("userId", user?.id ?: "")
 
                                     startActivity(intent)
                                     finish()
@@ -294,4 +354,5 @@ class SubscriptionActivity : ComponentActivity() {
             }
         }
     }
+
 }

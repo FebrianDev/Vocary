@@ -21,7 +21,7 @@ import com.febriandev.vocary.data.db.entity.VocabularyEntity
 
 @Database(
     entities = [GeneratedVocabEntity::class, VocabularyEntity::class, GameSessionEntity::class, DailyProgressEntity::class, StreakEntity::class, UserEntity::class, SearchVocabularyEntity::class],
-    version = 9,
+    version = 10,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

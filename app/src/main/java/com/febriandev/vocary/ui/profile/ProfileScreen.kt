@@ -71,7 +71,7 @@ fun ProfileScreen(
     context: Context,
     activity: Activity,
     syncData: () -> Unit,
-    onDeleteData: () -> Unit,
+    onDeleteData: suspend () -> Unit,
     onDismiss: () -> Unit,
 ) {
 

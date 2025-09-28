@@ -40,7 +40,7 @@ fun ProgressDialog(text: String = "Please wait...", onDismissRequest: () -> Unit
             ) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 Spacer(Modifier.width(16.dp))
-                Text(text = text, style = MaterialTheme.typography.titleMedium)
+                Text(text = text, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
             }
         }
     }

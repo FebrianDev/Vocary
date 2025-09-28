@@ -20,5 +20,19 @@ enum class TopicType(val displayName: String) {
     OBJECTS("Common Objects"),
     VERBS("Common Verbs"),
     ADJECTIVES("Common Adjectives"),
-    EXPRESSIONS("Useful Expressions")
+    EXPRESSIONS("Useful Expressions"),
+    SCIENCE("Science & Knowledge"),
+    ENVIRONMENT("Environment & Sustainability"),
+    SPORTS("Sports & Recreation"),
+    MUSIC("Music & Performing Arts"),
+    WEATHER("Weather & Seasons"),
+    ANIMALS("Animals & Wildlife"),
+    PLANTS("Plants & Vegetation"),
+    HISTORY("History & Civilizations"),
+    LAW("Law & Justice"),
+    RELIGION("Religion & Beliefs"),
+    GEOGRAPHY("Geography & Places"),
+    EMERGENCIES("Emergencies & Survival"),
+    ART("Art & Creativity"),
+    COMMUNICATION("Communication & Media")
 }

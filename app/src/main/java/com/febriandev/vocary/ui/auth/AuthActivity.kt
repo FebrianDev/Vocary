@@ -50,7 +50,9 @@ import com.febriandev.vocary.R
 import com.febriandev.vocary.ui.components.EmailTextField
 import com.febriandev.vocary.ui.components.PasswordTextField
 import com.febriandev.vocary.ui.onboard.DownloadActivity
+import com.febriandev.vocary.ui.onboard.OnboardActivity
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.RevenueCatViewModel
 import com.febriandev.vocary.utils.showMessage
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -61,6 +63,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class AuthActivity : BaseActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
+    private val revenueCatViewModel: RevenueCatViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +73,7 @@ class AuthActivity : BaseActivity() {
             VocaryTheme {
 
                 val user by authViewModel.user.collectAsState()
+                val loading by authViewModel.loading.collectAsState()
 
                 var email by remember { mutableStateOf("") }
                 var password by remember { mutableStateOf("") }
@@ -78,9 +82,22 @@ class AuthActivity : BaseActivity() {
 
                 LaunchedEffect(user) {
                     if (user != null) {
-                        val intent = Intent(applicationContext, DownloadActivity::class.java)
-                        intent.putExtra("user", user)
-                        startActivity(intent)
+                        val exists = authViewModel.getExistUser(user?.uid!!)
+                        if (exists) {
+                            revenueCatViewModel.logIn(user?.uid.toString())
+                            val intent = Intent(applicationContext, DownloadActivity::class.java)
+                            intent.putExtra("user", user)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            val intent = Intent(applicationContext, OnboardActivity::class.java)
+                            intent.putExtra("user", user)
+                            startActivity(intent)
+                            finish()
+                        }
+
+                        Log.d("AppUser", "User exists: $exists, user data: $user")
+
                         Log.d("AppUser", user.toString())
                     }
                 }
@@ -152,7 +169,8 @@ class AuthActivity : BaseActivity() {
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(48.dp)
+                                .height(48.dp),
+                            enabled = !loading
                         ) {
                             Text("Login")
                         }

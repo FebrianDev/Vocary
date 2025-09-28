@@ -23,4 +23,6 @@ object Constant {
     //STREAK TYPE
     const val DAILY_GOAL = "DAILY_GOAL"
     const val OPEN_APP = "OPEN_APP"
+
+    const val STEP_SCREEN = "STEP_SCREEN"
 }

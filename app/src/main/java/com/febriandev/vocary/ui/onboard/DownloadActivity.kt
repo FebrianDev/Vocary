@@ -39,6 +39,8 @@ import com.febriandev.vocary.domain.AppUser
 import com.febriandev.vocary.ui.theme.ThemeMode
 import com.febriandev.vocary.ui.theme.ThemeState
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.utils.Constant.STEP_SCREEN
+import com.febriandev.vocary.utils.Prefs
 import kotlinx.coroutines.delay
 
 class DownloadActivity : BaseActivity() {
@@ -47,7 +49,7 @@ class DownloadActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        Prefs[STEP_SCREEN] = 3
         val user: AppUser? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("user", AppUser::class.java)
         } else {
@@ -80,7 +82,7 @@ class DownloadActivity : BaseActivity() {
                     Log.d("DownloadData", "Worker state: $workerState")
 
                     if (workerState == WorkInfo.State.SUCCEEDED) {
-                        delay(2000)
+                        //delay(2000)
                         val intent = Intent(applicationContext, MainActivity::class.java)
                         startActivity(intent)
                         finish()
@@ -88,9 +90,9 @@ class DownloadActivity : BaseActivity() {
                 }
 
                 LaunchedEffect(Unit) {
-                    Log.d("DownloadData", user?.uid.toString())
-                    //downloadData(user?.uid ?: "")
-                    downloadData("9gVo97ctNtfPHrlehUVXC9BYOe02")
+                 //   Log.d("DownloadData", user?.uid.toString())
+                    downloadData(user?.uid ?: "")
+                  //  downloadData(user?.uid)
                 }
 
                 Scaffold(

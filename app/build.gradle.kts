@@ -15,9 +15,9 @@ android {
 
     defaultConfig {
         applicationId = "com.febriandev.vocary"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
-        versionCode = 2
+        versionCode = 8
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -210,19 +210,14 @@ android {
         implementation(libs.converter.gson)
         implementation(libs.logging.interceptor)
 
-        //system ui controller
-        //  implementation(libs.accompanist.systemuicontroller)
-
         //speech to text
-        implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.33.0")
+        implementation("com.microsoft.cognitiveservices.speech:client-sdk:1.44.0")
 
         //work manager
         implementation("androidx.work:work-runtime-ktx:2.9.0")
 
-        //revenue cat
-        implementation("com.revenuecat.purchases:purchases:8.7.0")
-
-        implementation("com.google.android.gms:play-services-auth:20.7.0")
+        //auth
+        implementation("com.google.android.gms:play-services-auth:21.4.0")
 
         //lottie
         implementation("com.airbnb.android:lottie-compose:6.1.0")
@@ -244,16 +239,13 @@ android {
         //revenue cat
         implementation("com.revenuecat.purchases:purchases:8.7.0")
 
-//        // Fix ListenableFuture conflict
-//        implementation("androidx.concurrent:concurrent-futures:1.1.0")
-//        implementation("com.google.guava:guava:31.1-android") {
-//            exclude(group = "com.google.guava", module = "listenablefuture")
-//        }
+        //one signal
+        implementation("com.onesignal:OneSignal:[5.0.0, 5.99.99]")
 
     }
 }
 
-dependencies{
+dependencies {
     //firebase
     implementation(libs.firebase.auth)
     implementation(libs.androidx.credentials)

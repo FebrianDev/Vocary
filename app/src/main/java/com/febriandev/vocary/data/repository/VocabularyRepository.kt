@@ -1,5 +1,6 @@
 package com.febriandev.vocary.data.repository
 
+import androidx.room.Query
 import com.febriandev.vocary.data.db.dao.VocabularyDao
 import com.febriandev.vocary.data.db.entity.SrsStatus
 import com.febriandev.vocary.data.db.entity.VocabularyEntity

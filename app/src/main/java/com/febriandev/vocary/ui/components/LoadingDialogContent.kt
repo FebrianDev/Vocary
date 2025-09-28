@@ -1,5 +1,6 @@
 package com.febriandev.vocary.ui.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -23,11 +24,23 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.febriandev.vocary.ui.theme.ThemeMode
+import com.febriandev.vocary.ui.theme.ThemeState
 import kotlinx.coroutines.delay
 
 @Composable
 fun LoadingDialogContent() {
-    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("loading.json"))
+
+    val themeMode by ThemeState.themeMode
+    val isSystemDark = isSystemInDarkTheme()
+
+    val darkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemDark
+    }
+
+    val composition by rememberLottieComposition(LottieCompositionSpec.Asset(if (darkTheme) "loading_dark.json" else "loading_vocabulary.json"))
     val progress by animateLottieCompositionAsState(
         composition = composition,
         iterations = LottieConstants.IterateForever
@@ -36,7 +49,7 @@ fun LoadingDialogContent() {
     val loadingTexts = listOf(
         "Preparing your vocabulary...",
         "Connecting to AI...",
-        "Generating words based on your topic...",
+        "Generating words\nbased on your topic...",
         "Getting definitions from dictionary...",
         "Almost done!"
     )

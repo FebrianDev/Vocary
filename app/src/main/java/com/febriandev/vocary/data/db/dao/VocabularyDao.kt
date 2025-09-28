@@ -13,7 +13,7 @@ interface VocabularyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVocabulary(vocabulary: VocabularyEntity)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertVocabulary(vocabulary: List<VocabularyEntity>)
 
     @Query("SELECT * FROM vocabulary WHERE word = :word LIMIT 1")
@@ -31,7 +31,7 @@ interface VocabularyDao {
       id DESC
     """
     )
-    suspend fun getAllVocabulary(currentTime:Long): List<VocabularyEntity>
+    suspend fun getAllVocabulary(currentTime: Long): List<VocabularyEntity>
 
     @Query(
         """
@@ -109,22 +109,26 @@ interface VocabularyDao {
     @Query("UPDATE vocabulary SET isHistory = 1, historyTimestamp = :timestamp WHERE id = :id")
     suspend fun addToHistory(id: String, timestamp: Long = System.currentTimeMillis())
 
-    @Query("""
+    @Query(
+        """
     SELECT DISTINCT * 
     FROM vocabulary 
     WHERE isOwnWord = 1
     ORDER BY id DESC
-""")
+"""
+    )
     suspend fun getAllOwnWord(): List<VocabularyEntity>
 
-    @Query("""
+    @Query(
+        """
     SELECT DISTINCT * 
     FROM vocabulary
     WHERE word LIKE '%' || :query || '%' 
       AND isOwnWord = 1 
 
     ORDER BY id DESC
-""")
+"""
+    )
     suspend fun searchOwnWord(query: String): List<VocabularyEntity>
 
     @Query("DELETE FROM vocabulary")

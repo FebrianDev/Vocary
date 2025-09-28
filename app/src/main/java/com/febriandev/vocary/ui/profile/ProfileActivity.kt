@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -31,6 +32,7 @@ import com.febriandev.vocary.ui.components.TitleTopBar
 import com.febriandev.vocary.ui.form.FormField
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.febriandev.vocary.ui.vm.UserViewModel
+import com.febriandev.vocary.utils.showMessage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -78,20 +80,12 @@ class ProfileActivity : ComponentActivity() {
                                     user = user?.copy(email = it)
                                 }
 
-//                                FormField(user?.age?.toString() ?: "", "Age") {
-//                                    user = user?.copy(age = it.toIntOrNull())
-//                                }
-
                                 FormField(
                                     user?.targetVocabulary?.toString() ?: "",
                                     "Target Vocabulary / Day"
                                 ) {
                                     user = user?.copy(targetVocabulary = it.toIntOrNull() ?: 0)
                                 }
-
-//                                FormField(user?.learningGoal ?: "", "Learning Goal") {
-//                                    user = user?.copy(learningGoal = it)
-//                                }
 
                                 FormField(
                                     user?.vocabLevel ?: "",
@@ -140,11 +134,30 @@ class ProfileActivity : ComponentActivity() {
 
                         Button(
                             onClick = {
-                                user?.let { userViewModel.updateUser(it) }
+                                when {
+                                    user?.name.isNullOrBlank() -> {
+                                        showMessage("Name cannot be empty")
+                                    }
+
+                                    user?.email.isNullOrBlank() -> {
+                                        showMessage("Email cannot be empty")
+                                    }
+
+                                    user?.targetVocabulary == null || user?.targetVocabulary == 0 -> {
+                                        showMessage("Target Vocabulary cannot be empty or 0")
+                                    }
+
+                                    else -> {
+                                        user?.let { userViewModel.updateUser(it) }
+                                        showMessage("Success update profile")
+                                    }
+                                }
                             },
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .padding(top = 16.dp)
+                                .fillMaxWidth()
+                                .height(48.dp)
+
                         ) {
                             Text("Save", style = MaterialTheme.typography.labelLarge)
                         }

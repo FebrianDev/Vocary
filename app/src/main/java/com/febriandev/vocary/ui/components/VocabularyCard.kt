@@ -72,7 +72,10 @@ fun VocabularyCard(
                 // Word & Favorite
                 Text(
                     text = word,
-                    style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Bold, fontSize = if(word.length > 10) 36.sp else 42.sp),
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = if (word.length > 10) 36.sp else 42.sp
+                    ),
                     color = primary
                 )
 
@@ -106,7 +109,7 @@ fun VocabularyCard(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = "($partOfSpeech) $definition",
+                    text = "${if (partOfSpeech.isNotEmpty()) "${(partOfSpeech)} " else ""}$definition",
                     style = MaterialTheme.typography.bodyLarge,
                     color = textColor,
                     maxLines = 2,
@@ -195,7 +198,7 @@ fun VocabularyCard(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (!shouldCaptureScreenshot) {
-            if(active) {
+            if (active) {
                 VocabularyAnswerSection(srsStatus, onAnswerClick)
             }
         }

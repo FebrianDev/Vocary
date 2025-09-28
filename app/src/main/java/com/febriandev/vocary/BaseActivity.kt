@@ -36,7 +36,7 @@ abstract class BaseActivity : ComponentActivity() {
     }
 
 
-    fun startGenerateProcess(topic: String, level: String) {
+    fun startGenerateProcess(topic: String, level: String, userId: String) {
 
         if (!isWorkerRunning("GenerateVocabulary") && ConnHelper.hasConnection(applicationContext)) {
 
@@ -50,6 +50,7 @@ abstract class BaseActivity : ComponentActivity() {
                     workDataOf(
                         "topic" to topic,
                         "level" to level,
+                        "userId" to userId
                     )
                 )
                 .build()
@@ -77,7 +78,7 @@ abstract class BaseActivity : ComponentActivity() {
         }
     }
 
-    fun syncData(uid:String) {
+    fun syncData(uid: String) {
         if (!isWorkerRunning("SYNC_DATA")) {
             showMessage("Sync Data...")
             val workRequest = OneTimeWorkRequestBuilder<SyncDataWorker>()
@@ -104,26 +105,26 @@ abstract class BaseActivity : ComponentActivity() {
     }
 
     fun downloadData(uid: String) {
-      //  if (!isWorkerRunning("DOWNLOAD_DATA")) {
-            showMessage("Download Data...")
-            val workRequest = OneTimeWorkRequestBuilder<DownloadDataWorker>()
-                .setConstraints(
-                    Constraints.Builder()
-                        .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-                        .build()
-                )
-                .setInputData(
-                    workDataOf(
-                        "uid" to uid
-                    )
-                )
-                .build()
-
-            workManager.enqueueUniqueWork(
-                "DOWNLOAD_DATA",
-                ExistingWorkPolicy.KEEP,
-                workRequest
+        //  if (!isWorkerRunning("DOWNLOAD_DATA")) {
+        //showMessage("Download Data...")
+        val workRequest = OneTimeWorkRequestBuilder<DownloadDataWorker>()
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+                    .build()
             )
+            .setInputData(
+                workDataOf(
+                    "uid" to uid
+                )
+            )
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "DOWNLOAD_DATA",
+            ExistingWorkPolicy.KEEP,
+            workRequest
+        )
 //        } else {
 //            showMessage("Download Data...")
 //        }
