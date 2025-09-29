@@ -1,5 +1,6 @@
 package com.febriandev.vocary.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,10 +28,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.febriandev.vocary.R
 import com.febriandev.vocary.data.db.entity.SrsStatus
 
 @Composable
@@ -63,7 +70,6 @@ fun VocabularyCard(
             shape = RoundedCornerShape(16.dp),
             color = background,
             tonalElevation = 4.dp,
-            // border = if(shouldCaptureScreenshot) BorderStroke(1.dp, Color.White) else null
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -157,17 +163,6 @@ fun VocabularyCard(
                             )
                         }
 
-//                    IconButton(onClick = onTranslate) {
-//                        Icon(
-//                            Icons.Default.Translate,
-//                            contentDescription = "Translate",
-//                            tint = primary,
-//                            modifier = Modifier.size(32.dp)
-//                        )
-//                    }
-
-
-                        //  Spacer(modifier = Modifier.width(24.dp))
 
                         IconButton(onClick = onShareClick) {
                             Icon(
@@ -177,9 +172,6 @@ fun VocabularyCard(
                                 modifier = Modifier.size(32.dp)
                             )
                         }
-
-
-                        // Spacer(modifier = Modifier.width(32.dp))
 
                         IconButton(onClick = onFavoriteClick) {
                             Icon(
@@ -191,6 +183,35 @@ fun VocabularyCard(
                         }
                     }
 
+                }
+
+                if (shouldCaptureScreenshot) {
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(2.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.icon_image2),
+                                contentDescription = stringResource(R.string.app_name),
+                                modifier = Modifier
+                                    .size(36.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Vocary",
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                        }
+                    }
                 }
             }
         }

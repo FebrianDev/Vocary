@@ -39,6 +39,7 @@ import com.febriandev.vocary.ui.theme.ThemeMode
 import com.febriandev.vocary.ui.theme.ThemeState
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.febriandev.vocary.utils.Constant.STEP_SCREEN
+import com.febriandev.vocary.utils.Constant.TUTORIAL
 import com.febriandev.vocary.utils.Prefs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -49,7 +50,10 @@ class LoadingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         Prefs[STEP_SCREEN] = 3
+        Prefs[TUTORIAL] = true
+
         val level = intent.getStringExtra("level") ?: "Intermediate"
         val topic = intent.getStringExtra("topic") ?: "Everyday Life"
         val userId = intent.getStringExtra("userId") ?: ""

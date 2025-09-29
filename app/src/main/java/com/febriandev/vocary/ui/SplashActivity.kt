@@ -2,12 +2,10 @@ package com.febriandev.vocary.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -21,7 +19,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,8 +31,6 @@ import com.febriandev.vocary.R
 import com.febriandev.vocary.ui.auth.AuthActivity
 import com.febriandev.vocary.ui.onboard.DownloadActivity
 import com.febriandev.vocary.ui.onboard.OnboardActivity
-import com.febriandev.vocary.ui.theme.ThemeMode
-import com.febriandev.vocary.ui.theme.ThemeState
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.febriandev.vocary.utils.Constant.STEP_SCREEN
 import com.febriandev.vocary.utils.Prefs
@@ -114,7 +109,7 @@ fun SplashScreen(onSplashFinished: suspend () -> Unit) {
         ) {
 
             Image(
-                painter = painterResource( R.drawable.icon_image2),
+                painter = painterResource(R.drawable.icon_image2),
                 contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier
                     .padding(bottom = 128.dp)

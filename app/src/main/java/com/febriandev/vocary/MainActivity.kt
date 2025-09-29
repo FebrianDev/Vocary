@@ -14,6 +14,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -32,6 +34,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -51,10 +55,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.composables.icons.lucide.GraduationCap
 import com.composables.icons.lucide.Lucide
 import com.febriandev.vocary.domain.Vocabulary
@@ -80,6 +87,7 @@ import com.febriandev.vocary.utils.Constant.DAILY_GOAL
 import com.febriandev.vocary.utils.Constant.LEVEL
 import com.febriandev.vocary.utils.Constant.OPEN_APP
 import com.febriandev.vocary.utils.Constant.TOPIC
+import com.febriandev.vocary.utils.Constant.TUTORIAL
 import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.utils.ScreenshotBox
 import com.febriandev.vocary.utils.ScreenshotController
@@ -177,6 +185,8 @@ class MainActivity : BaseActivity() {
                     }
                 }
 
+                var showTutorial by remember { mutableStateOf(Prefs[TUTORIAL, false]) }
+
                 Scaffold(
                     modifier = Modifier
                         .windowInsetsPadding(WindowInsets.systemBars)
@@ -234,7 +244,7 @@ class MainActivity : BaseActivity() {
                                         user?.targetVocabulary ?: 0,
                                         user?.id ?: "",
                                         user?.xp ?: 0
-                                    ){
+                                    ) {
                                         userViewModel.getUser()
                                     }
                                     if (dailyProgress != null && dailyProgress?.progress!! >= (user?.targetVocabulary
@@ -409,6 +419,80 @@ class MainActivity : BaseActivity() {
                         }
 
                         StreakScreen()
+                    }
+
+                    if (showTutorial) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color(0xAA000000))
+                                .clickable {
+                                    showTutorial = false
+                                    Prefs[TUTORIAL] = false
+                                }
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(32.dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    "Swipe up or down to explore words",
+                                    color = Color.White,
+                                    fontSize = 22.sp,
+                                    textAlign = TextAlign.Center
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                val infiniteTransition = rememberInfiniteTransition()
+                                val offsetY by infiniteTransition.animateFloat(
+                                    initialValue = 0f,
+                                    targetValue = 30f,
+                                    animationSpec = infiniteRepeatable(
+                                        animation = tween(800, easing = LinearEasing),
+                                        repeatMode = RepeatMode.Reverse
+                                    )
+                                )
+
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowUp,
+                                    contentDescription = "Swipe Up Arrow",
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .offset(y = -offsetY.dp)
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowDown,
+                                    contentDescription = "Swipe Down Arrow",
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .offset(y = offsetY.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                Text(
+                                    "Tap icons to play pronunciation, info, notes, share, or favorite",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    textAlign = TextAlign.Center
+                                )
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                Button(onClick = {
+                                    showTutorial = false
+                                    Prefs[TUTORIAL] = false
+                                }) {
+                                    Text("Got it!")
+                                }
+                            }
+                        }
                     }
                 }
 

@@ -25,4 +25,6 @@ object Constant {
     const val OPEN_APP = "OPEN_APP"
 
     const val STEP_SCREEN = "STEP_SCREEN"
+
+    const val TUTORIAL = "TUTORIAL"
 }

@@ -31,7 +31,6 @@ import com.febriandev.vocary.utils.speakText
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.VerticalPager
 import com.google.accompanist.pager.rememberPagerState
-import com.joco.showcase.sequence.rememberSequenceShowcaseState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -83,7 +82,7 @@ fun VocabularyVerticalPager(
 
         LaunchedEffect(pagerState.currentPage) {
 
-            if(!Prefs[PRONOUNCE, false]) return@LaunchedEffect
+            if (!Prefs[PRONOUNCE, false]) return@LaunchedEffect
 
             val page = pagerState.currentPage
             if (page != lastHandledPage) {
@@ -153,7 +152,7 @@ fun VocabularyVerticalPager(
                         } else null
 
                         if (ConnHelper.hasConnection(applicationContext)) {
-                            // speakText(vocabulary.word)
+                            speakText(vocabulary.word)
                         } else {
                             if (file != null) {
                                 playAudioFromFile(file)
