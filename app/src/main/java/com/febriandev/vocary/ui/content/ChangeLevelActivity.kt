@@ -30,6 +30,7 @@ import com.febriandev.vocary.ui.onboard.LevelType
 import com.febriandev.vocary.ui.onboard.OnboardViewModel
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.febriandev.vocary.ui.vm.UserViewModel
+import com.febriandev.vocary.utils.showMessage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -91,7 +92,13 @@ class ChangeLevelActivity : ComponentActivity() {
                         Button(
                             onClick = {
                                 //Prefs[LEVEL] = level
-                                val newUser = user?.copy(vocabLevel = level)
+
+                                if (user == null) {
+                                    showMessage("User is empty...")
+                                    return@Button
+                                }
+
+                                val newUser = user?.copy(vocabLevel = level, isSync = false)
                                 userViewModel.updateUser(newUser!!)
                                 finish()
                             },

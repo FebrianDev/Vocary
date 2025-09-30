@@ -15,6 +15,10 @@ class VocabularyRepository @Inject constructor(private val vocabularyDao: Vocabu
         return vocabularyDao.getAllVocabulary(currentTime).map { it.toVocabulary() }.shuffled()
     }
 
+    suspend fun getAllVocabulary(currentTime: Long, preferredId: String? = null): List<Vocabulary> {
+        return vocabularyDao.getAllVocabulary(currentTime, preferredId).map { it.toVocabulary() }
+    }
+
     // suspend fun getFavorites(): List<VocabularyEntity> = vocabularyDao.getFavorites()
 
     suspend fun updateSrs(id: String, srsStatus: SrsStatus, dueDate: Long) {

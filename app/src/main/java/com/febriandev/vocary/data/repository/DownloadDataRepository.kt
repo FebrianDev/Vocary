@@ -186,6 +186,8 @@ class DownloadDataRepository @Inject constructor(
                 )?.toEntity()
             }
 
+            Log.w("DownloadRepo", "for $userId $list")
+
             if (list.isNotEmpty()) {
                 dao.deleteUserIsSync()
                 dao.insertOrUpdateUser(list.first()) // ambil yang pertama, kalau cuma 1 user

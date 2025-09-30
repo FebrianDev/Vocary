@@ -194,7 +194,7 @@ fun ProfileScreen(
     DialogOK(
         isAbout,
         "Vocary",
-        "Vocary - Vocab Mastery is an interactive and user-friendly vocabulary learning app designed to help learners of all levels master English words effectively"
+        "Vocary - Vocabulary Mastery is an interactive and user-friendly vocabulary learning app designed to help learners of all levels master English words effectively"
     ) {
         isAbout = false
     }
@@ -361,7 +361,7 @@ fun ThemeSettingsRow(modifier: Modifier = Modifier) {
                                 .clickable {
                                     ThemeState.themeMode.value = mode
                                     Prefs[DARK_MODE] = mode.name
-                                    showDialog = false // tutup dialog setelah pilih
+                                    showDialog = false
                                 }
                                 .padding(vertical = 2.dp)
                         ) {
@@ -386,8 +386,9 @@ fun ThemeSettingsRow(modifier: Modifier = Modifier) {
             }
         )
     }
+
     HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
-    // }
+
 }
 
 

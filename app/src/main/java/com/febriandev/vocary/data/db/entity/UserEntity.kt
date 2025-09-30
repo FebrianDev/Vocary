@@ -20,7 +20,7 @@ data class UserEntity(
     val vocabTopic: String?,
     val premium: Boolean,
     val premiumDuration: String?,
-    val isRevenueCat: Boolean = false,
+    val revenueCat: Boolean = false,
     val deviceName: String?,
     val deviceId: String?,
     val isSync: Boolean = false,

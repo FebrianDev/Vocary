@@ -27,17 +27,12 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
     private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading
 
-
-    init {
-        getAllVocabulary()
-    }
-
-    fun getAllVocabulary() {
+    fun getAllVocabulary(preferredId: String? = null) {
         viewModelScope.launch {
-
+            _loading.value = true
             val now = System.currentTimeMillis()
 
-            val vocabList = repository.getAllVocabulary(now)
+            val vocabList = repository.getAllVocabulary(now, preferredId)
             val finalList = vocabList.map { vocab ->
                 if (vocab.srsDueDate <= now) {
                     vocab.copy(srsStatus = SrsStatus.NEW)
@@ -45,7 +40,7 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
             }
 
             _vocabs.value = finalList
-
+            _loading.value = false
         }
     }
 
@@ -184,7 +179,7 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
 
     suspend fun deleteAllData() {
         //viewModelScope.launch {
-            repository.deleteAllData()
+        repository.deleteAllData()
         //}
     }
 

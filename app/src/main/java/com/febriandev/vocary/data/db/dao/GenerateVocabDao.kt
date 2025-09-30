@@ -14,7 +14,7 @@ interface GenerateVocabDao {
     @Query("SELECT * FROM generate_vocab WHERE isStatus = 0")
     suspend fun getPendingVocab(): List<GeneratedVocabEntity>
 
-    @Query("UPDATE generate_vocab SET isStatus = 1 WHERE word=:word")
+    @Query("UPDATE generate_vocab SET isStatus = 1, isSync=0 WHERE word=:word")
     suspend fun updateVocabDetail(word:String)
 
     @Query("DELETE FROM generate_vocab")

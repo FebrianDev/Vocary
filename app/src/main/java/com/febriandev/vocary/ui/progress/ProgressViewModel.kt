@@ -67,7 +67,8 @@ class ProgressViewModel @Inject constructor(
                         progress = progress.progress + 1,
                         isGoalAchieved = (progress.progress + 1) >= target,
                         listVocabulary = progress.listVocabulary + vocabId,
-                        updatedAt = System.currentTimeMillis()
+                        updatedAt = System.currentTimeMillis(),
+                        isSync = false
                     )
 
                 } else {

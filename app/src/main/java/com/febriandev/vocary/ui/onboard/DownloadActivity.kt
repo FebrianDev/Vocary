@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,12 +40,15 @@ import com.febriandev.vocary.domain.AppUser
 import com.febriandev.vocary.ui.theme.ThemeMode
 import com.febriandev.vocary.ui.theme.ThemeState
 import com.febriandev.vocary.ui.theme.VocaryTheme
+import com.febriandev.vocary.ui.vm.UserViewModel
 import com.febriandev.vocary.utils.Constant.STEP_SCREEN
 import com.febriandev.vocary.utils.Prefs
-import kotlinx.coroutines.delay
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DownloadActivity : BaseActivity() {
 
+    private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,9 +94,20 @@ class DownloadActivity : BaseActivity() {
                 }
 
                 LaunchedEffect(Unit) {
-                 //   Log.d("DownloadData", user?.uid.toString())
-                    downloadData(user?.uid ?: "")
-                  //  downloadData(user?.uid)
+
+                    Log.d("DownloadData", user?.uid.toString())
+
+                    if (user != null) {
+                        downloadData(user.uid)
+                    } else {
+                        val userEntity = userViewModel.getCurrentUser()
+                        Log.d("DownloadData", userEntity?.id.toString())
+                        if (userEntity != null) {
+                            downloadData(userEntity.id)
+                        }
+                    }
+
+                    //  downloadData(user?.uid)
                 }
 
                 Scaffold(

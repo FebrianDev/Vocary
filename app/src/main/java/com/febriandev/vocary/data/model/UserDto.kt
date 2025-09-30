@@ -8,14 +8,14 @@ data class UserDto(
     val email: String = "",
     val photoUrl: String? = null,
     val age: Int? = null,
-    val xp:Int? = 0,
+    val xp: Int = 0,
     val targetVocabulary: Int = 0,
     val learningGoal: String? = null,
     val vocabLevel: String? = null,
     val vocabTopic: String? = null,
     val premium: Boolean = false,
     val premiumDuration: String? = null,
-    val isRevenueCat: Boolean = false,
+    val revenueCat: Boolean = false,
     val deviceName: String? = null,
     val deviceId: String? = null,
     val isSync: Boolean = false,
@@ -26,6 +26,7 @@ data class UserDto(
         email = email,
         photoUrl = photoUrl,
         age = age,
+        xp = xp,
         targetVocabulary = targetVocabulary,
         learningGoal = learningGoal,
         vocabLevel = vocabLevel,
@@ -34,6 +35,7 @@ data class UserDto(
         premiumDuration = premiumDuration,
         deviceName = deviceName,
         deviceId = deviceId,
+        revenueCat = revenueCat,
         isSync = isSync
     )
 

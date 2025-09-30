@@ -112,10 +112,10 @@ fun SplashScreen(onSplashFinished: suspend () -> Unit) {
                 painter = painterResource(R.drawable.icon_vocary),
                 contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier
-                    .padding(bottom = 154.dp)
-                    .size(154.dp)
+                    .padding(bottom = 224.dp)
+                    .size(124.dp)
                     .align(Alignment.Center),
-               // colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
             )
 
             Column(

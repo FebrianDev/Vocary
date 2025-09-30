@@ -111,18 +111,19 @@ fun VocabularyVerticalPager(
                         } else {
                             if (audioFile != null) {
                                 playAudioFromFile(audioFile!!)
-                            } else {
-                                withContext(Dispatchers.Main) {
-                                    applicationContext.showMessage("Failed download audio!")
-                                }
                             }
+//                            else {
+//                                withContext(Dispatchers.Main) {
+//                                    //applicationContext.showMessage("Failed download audio!")
+//                                }
+//                            }
                         }
                     } catch (e: Exception) {
                         Log.e("AudioPlay", "Error: ${e.localizedMessage}")
                         // fallback ke TTS
-                        withContext(Dispatchers.Main) {
-                            applicationContext.showMessage("Failed download audio!")
-                        }
+//                        withContext(Dispatchers.Main) {
+//                            applicationContext.showMessage("Failed download audio!")
+//                        }
                     }
                 }
             }

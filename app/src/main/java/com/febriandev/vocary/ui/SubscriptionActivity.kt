@@ -99,7 +99,7 @@ class SubscriptionActivity : ComponentActivity() {
                         val newUser = user.copy(
                             premium = true,
                             premiumDuration = premiumExpirationDate,
-                            isRevenueCat = true
+                            revenueCat = true
                         )
                         userViewModel.saveUser(newUser)
                         showMessage("Premium activated!")
@@ -257,7 +257,7 @@ class SubscriptionActivity : ComponentActivity() {
                                     val newUser = user?.copy(
                                         premium = true,
                                         premiumDuration = getExpirationDate(30),
-                                        isRevenueCat = false
+                                        revenueCat = false
                                     )
 
                                     if (newUser != null)

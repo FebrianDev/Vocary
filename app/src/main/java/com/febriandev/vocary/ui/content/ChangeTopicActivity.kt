@@ -32,6 +32,7 @@ import com.febriandev.vocary.ui.onboard.OnboardViewModel
 import com.febriandev.vocary.ui.onboard.TopicType
 import com.febriandev.vocary.ui.theme.VocaryTheme
 import com.febriandev.vocary.ui.vm.UserViewModel
+import com.febriandev.vocary.utils.showMessage
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -98,7 +99,13 @@ class ChangeTopicActivity : ComponentActivity() {
                                 .fillMaxWidth(),
                             onClick = {
                                 //  Prefs[TOPIC] = selectedTopic?.displayName
-                                val newUser = user?.copy(vocabTopic = selectedTopic?.name)
+
+                                if(user == null) {
+                                    showMessage("User is empty...")
+                                    return@Button
+                                }
+
+                                val newUser = user?.copy(vocabTopic = selectedTopic?.name, isSync = false)
                                 userViewModel.updateUser(newUser!!)
                                 finish()
                             }

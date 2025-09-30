@@ -134,6 +134,9 @@ class ProfileActivity : ComponentActivity() {
 
                         Button(
                             onClick = {
+
+                                if (user == null) return@Button
+
                                 when {
                                     user?.name.isNullOrBlank() -> {
                                         showMessage("Name cannot be empty")
@@ -148,6 +151,7 @@ class ProfileActivity : ComponentActivity() {
                                     }
 
                                     else -> {
+                                        user = user!!.copy(isSync = false)
                                         user?.let { userViewModel.updateUser(it) }
                                         showMessage("Success update profile")
                                     }

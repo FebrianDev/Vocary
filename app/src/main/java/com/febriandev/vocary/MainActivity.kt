@@ -62,6 +62,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.composables.icons.lucide.GraduationCap
 import com.composables.icons.lucide.Lucide
 import com.febriandev.vocary.domain.Vocabulary
@@ -92,12 +97,14 @@ import com.febriandev.vocary.utils.Prefs
 import com.febriandev.vocary.utils.ScreenshotBox
 import com.febriandev.vocary.utils.ScreenshotController
 import com.febriandev.vocary.utils.showMessage
+import com.febriandev.vocary.worker.NotificationWorker
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -114,12 +121,16 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val preferredId = intent.getStringExtra("VOCAB_ID")
+
         setContent {
             VocaryTheme {
 
                 //  val PROGRESS_MAX = 10
 
                 LaunchedEffect(Unit) {
+                    vocabViewModel.getAllVocabulary(preferredId)
                     userViewModel.getUser()
                     val user = userViewModel.getCurrentUser()
                     if (user != null) {
@@ -129,10 +140,29 @@ class MainActivity : BaseActivity() {
                                 user.vocabLevel ?: "Intermediate",
                                 user.id
                             )
+
+                        val constraints = Constraints.Builder()
+                            .setRequiresBatteryNotLow(true)
+                            .setRequiresDeviceIdle(false)
+                            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+                            .build()
+
+                        val request =
+                            PeriodicWorkRequestBuilder<NotificationWorker>(4, TimeUnit.HOURS)
+                                .setConstraints(constraints)
+                                .setInitialDelay(4, TimeUnit.HOURS)
+                                .build()
+
+                        WorkManager.getInstance(this@MainActivity).enqueueUniquePeriodicWork(
+                            "daily_notification",
+                            ExistingPeriodicWorkPolicy.UPDATE,
+                            request
+                        )
                     }
 
                     progressViewModel.getProgress()
                     streakViewModel.markStreak(OPEN_APP, true)
+
                 }
 
                 val dailyProgress by progressViewModel.dailyProgress.collectAsState()
@@ -164,7 +194,7 @@ class MainActivity : BaseActivity() {
                 val pagerState = rememberPagerState(initialPage = 0)
                 val currentPage = pagerState.currentPage
 
-                LaunchedEffect(currentPage) {
+                LaunchedEffect(currentPage, vocabs) {
                     val vocab = vocabs.getOrNull(currentPage) ?: return@LaunchedEffect
                     vocabViewModel.tryAddToHistory(vocab)
                 }
@@ -180,7 +210,7 @@ class MainActivity : BaseActivity() {
                     level = user?.vocabLevel ?: "Intermediate"
                     topic = user?.vocabTopic ?: "English Everyday Life"
 
-                    if (user != null && user?.isRevenueCat == true) {
+                    if (user != null && user?.revenueCat == true) {
                         userViewModel.syncPremiumStatus(user!!)
                     }
                 }

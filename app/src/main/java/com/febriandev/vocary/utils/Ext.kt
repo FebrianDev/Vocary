@@ -29,8 +29,15 @@ import com.microsoft.cognitiveservices.speech.ResultReason
 import com.microsoft.cognitiveservices.speech.SpeechConfig
 import com.microsoft.cognitiveservices.speech.SpeechSynthesisCancellationDetails
 import com.microsoft.cognitiveservices.speech.SpeechSynthesizer
+import com.onesignal.OneSignal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -43,7 +50,6 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.UUID
 import kotlin.math.ln
-
 
 @SuppressLint("HardwareIds")
 fun getAppId(context: Context): String {
@@ -300,4 +306,53 @@ fun getExpirationDate(days: Int = 30): String {
     dateFormat.timeZone = TimeZone.getTimeZone("UTC")
 
     return dateFormat.format(calendar.time)
+}
+
+fun sendOneSignalNotification(userId: String, id: String, title: String, message: String) {
+
+    Log.d("OneSignal", "OneSignalId: ${OneSignal.User.pushSubscription.id}")
+    Log.d("OneSignal", "IsSubscribed: ${OneSignal.User.pushSubscription.optedIn}")
+    Log.d("OneSignal", "ExternalId: ${OneSignal.User.externalId}")
+
+
+    val oneSignalAppId = "0140f446-57b5-4908-a124-5b6f55e0499e"
+
+    val jsonBody = JSONObject().apply {
+        put("app_id", oneSignalAppId)
+        put("include_external_user_ids", JSONArray().put(userId))
+        put("headings", JSONObject().put("en", title))
+        put("contents", JSONObject().put("en", message))
+        put("data", JSONObject().apply {
+            put("vocab_id", id)
+        })
+    }
+
+
+
+    try {
+        val client = OkHttpClient()
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val body = jsonBody.toString().toRequestBody(mediaType)
+        val request = Request.Builder()
+            .url("https://onesignal.com/api/v1/notifications")
+            .post(body)
+            .addHeader("Authorization", "Basic ${BuildConfig.API_ONE_SIGNAL}")
+            .build()
+
+        client.newCall(request).execute().use { response ->
+            val responseBody = response.body?.string()
+            Log.d("NotificationWorker", "Response: $responseBody")
+
+            if (!response.isSuccessful) {
+                Log.e(
+                    "NotificationWorker",
+                    "Failed to send OneSignal notification: ${response.code}"
+                )
+            } else {
+                Log.d("NotificationWorker", "Notification sent successfully")
+            }
+        }
+    } catch (e: Exception) {
+        Log.e("NotificationWorker", "Error sending OneSignal notification", e)
+    }
 }

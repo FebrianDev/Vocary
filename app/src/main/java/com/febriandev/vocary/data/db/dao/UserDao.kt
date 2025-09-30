@@ -1,6 +1,11 @@
 package com.febriandev.vocary.data.db.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.febriandev.vocary.data.db.entity.UserEntity
 
 @Dao
@@ -18,11 +23,11 @@ interface UserDao {
     @Update
     suspend fun updateUser(user: UserEntity)
 
-    @Query("UPDATE user SET premium = :premium, premiumDuration = :premiumDuration WHERE id = :id")
+    @Query("UPDATE user SET premium = :premium, premiumDuration = :premiumDuration, isSync=0 WHERE id = :id")
     suspend fun updatePremiumFields(id: String, premium: Boolean, premiumDuration: String?)
 
-    @Query("UPDATE user SET xp = :xp WHERE id = :id")
-    suspend fun updateXp(id: String, xp:Int)
+    @Query("UPDATE user SET xp = :xp, isSync=0 WHERE id = :id")
+    suspend fun updateXp(id: String, xp: Int)
 
 
     @Delete

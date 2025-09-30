@@ -19,7 +19,8 @@ interface VocabularyDao {
     @Query("SELECT * FROM vocabulary WHERE word = :word LIMIT 1")
     suspend fun getVocabularyByWord(word: String): VocabularyEntity?
 
-    @Query("""
+    @Query(
+        """
     SELECT DISTINCT * 
     FROM vocabulary 
     WHERE
@@ -27,7 +28,8 @@ interface VocabularyDao {
 
     ORDER BY id DESC 
     LIMIT 1
-""")
+"""
+    )
     fun getVocab(): VocabularyEntity?
 
     @Query(
@@ -46,9 +48,28 @@ interface VocabularyDao {
 
     @Query(
         """
+    SELECT DISTINCT * 
+    FROM vocabulary 
+    WHERE isReport = 0
+      AND (srsStatus = 'NEW' OR srsDueDate <= :currentTime)
+    ORDER BY 
+      CASE WHEN id = :preferredId THEN 0 ELSE 1 END,
+      CASE WHEN srsStatus = 'NEW' THEN 0 ELSE 1 END,
+      srsDueDate ASC,
+      id DESC
+    """
+    )
+    suspend fun getAllVocabulary(
+        currentTime: Long,
+        preferredId: String? = null
+    ): List<VocabularyEntity>
+
+
+    @Query(
+        """
         UPDATE vocabulary 
         SET srsStatus = :status, 
-            srsDueDate = :dueDate 
+            srsDueDate = :dueDate, isSync=0
         WHERE id = :id
     """
     )
@@ -61,7 +82,7 @@ interface VocabularyDao {
     @Query(
         """
         UPDATE vocabulary 
-        SET note = :note
+        SET note = :note, isSync=0
         WHERE id = :id
     """
     )
@@ -73,7 +94,7 @@ interface VocabularyDao {
     @Query(
         """
         UPDATE vocabulary 
-        SET isReport=1
+        SET isReport=1, isSync=0
         WHERE id = :id
     """
     )
@@ -104,10 +125,10 @@ interface VocabularyDao {
     @Query("SELECT EXISTS(SELECT 1 FROM vocabulary WHERE id = :id AND isFavorite = 1)")
     suspend fun isFavorite(id: String): Boolean
 
-    @Query("UPDATE vocabulary SET isFavorite = 1, favoriteTimestamp = :timestamp WHERE id = :id")
+    @Query("UPDATE vocabulary SET isFavorite = 1, isSync=0, favoriteTimestamp = :timestamp, isSync=0 WHERE id = :id")
     suspend fun addToFavorite(id: String, timestamp: Long = System.currentTimeMillis())
 
-    @Query("UPDATE vocabulary SET isFavorite = 0, favoriteTimestamp = NULL WHERE id = :id")
+    @Query("UPDATE vocabulary SET isFavorite = 0, favoriteTimestamp = NULL, isSync=0 WHERE id = :id")
     suspend fun removeFromFavorite(id: String)
 
     // --- History ---
@@ -117,7 +138,7 @@ interface VocabularyDao {
     @Query(" SELECT * FROM vocabulary WHERE word LIKE '%' || :query || '%' ORDER BY historyTimestamp DESC")
     fun searchHistory(query: String): Flow<List<VocabularyEntity>>
 
-    @Query("UPDATE vocabulary SET isHistory = 1, historyTimestamp = :timestamp WHERE id = :id")
+    @Query("UPDATE vocabulary SET isHistory = 1, historyTimestamp = :timestamp, isSync=0 WHERE id = :id")
     suspend fun addToHistory(id: String, timestamp: Long = System.currentTimeMillis())
 
     @Query(

@@ -77,6 +77,24 @@ android {
                 "\"357c17d8camsh689723147f1b925p127dc4jsnbbf4ae56f714\""
             )
 
+            buildConfigField(
+                "String",
+                "API_ONE_SIGNAL",
+                "\"os_v2_app_afapirsxwveqrijelnxvlycjtzhycsbxx3beyxufgml2fpjghldktyupims7q24etc3kfkxtx4nozfhhe5wd5dglbp7e7lgslz7tafi\""
+            )
+
+            buildConfigField(
+                "String",
+                "ONESIGNAL_APP_ID",
+                "\"0140f446-57b5-4908-a124-5b6f55e0499e\""
+            )
+
+            buildConfigField(
+                "String",
+                "REVENUECAT_APP_ID",
+                "\"goog_SDrghgQzcdXSqrZMAYWTJQzvGZn\""
+            )
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -139,6 +157,24 @@ android {
                 "String",
                 "API_WORDS_API",
                 "\"357c17d8camsh689723147f1b925p127dc4jsnbbf4ae56f714\""
+            )
+
+            buildConfigField(
+                "String",
+                "API_ONESIGNAL",
+                "\"os_v2_app_afapirsxwveqrijelnxvlycjtzhycsbxx3beyxufgml2fpjghldktyupims7q24etc3kfkxtx4nozfhhe5wd5dglbp7e7lgslz7tafi\""
+            )
+
+            buildConfigField(
+                "String",
+                "ONESIGNAL_APP_ID",
+                "\"0140f446-57b5-4908-a124-5b6f55e0499e\""
+            )
+
+            buildConfigField(
+                "String",
+                "REVENUECAT_APP_ID",
+                "\"goog_SDrghgQzcdXSqrZMAYWTJQzvGZn\""
             )
 
             proguardFiles(
