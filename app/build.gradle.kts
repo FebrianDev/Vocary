@@ -79,7 +79,7 @@ android {
 
             buildConfigField(
                 "String",
-                "API_ONE_SIGNAL",
+                "API_ONESIGNAL",
                 "\"os_v2_app_afapirsxwveqrijelnxvlycjtzhycsbxx3beyxufgml2fpjghldktyupims7q24etc3kfkxtx4nozfhhe5wd5dglbp7e7lgslz7tafi\""
             )
 

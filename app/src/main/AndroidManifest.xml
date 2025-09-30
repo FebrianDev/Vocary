@@ -26,6 +26,13 @@
         android:theme="@style/Theme.Vocary"
         tools:targetApi="31">
 
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"
+            tools:replace="android:enabled,android:exported,android:foregroundServiceType"/>
+
 
         <activity
             android:name=".MainActivity"

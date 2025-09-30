@@ -25,8 +25,7 @@ class NotificationWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val vocabulary = vocabularyRepository.getAllVocabulary(System.currentTimeMillis())
-        val vocab = if (vocabulary.isNotEmpty()) vocabulary[0] else null
+        val vocab = vocabularyRepository.getVocab()
 
         if (currentHour in 7..20 && Prefs[NOTIFICATION, true]) {
 

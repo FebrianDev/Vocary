@@ -27,6 +27,10 @@ class GenerateVocabRepository @Inject constructor(
 ) {
 
     suspend fun generateVocabulary(topic: String, level: String, userId: String) {
+
+        val listWords = generateDao.getAllWord().shuffled()
+            .take(100).joinToString(", ") { "\"$it\"" }
+
         val prompt = """
          You are an English teacher AI.
 
@@ -40,6 +44,8 @@ class GenerateVocabRepository @Inject constructor(
         - Cover different parts of speech (nouns, verbs, adjectives, expressions) when possible.
         - If the topic is broad, do not stick to only the most obvious words.
         - If common words are likely already used, choose fresher, rarer alternatives.
+        - Do NOT include these words: [$listWords]
+        - Always try fresh and less obvious words.
             
             ✅ Example output:
             ["apple", "banana", "grape", "orange", "melon"]
@@ -55,7 +61,12 @@ class GenerateVocabRepository @Inject constructor(
         val json = response.choices.firstOrNull()?.message?.content?.trim() ?: return
         val vocabList = convertToVocabListFromArray(json)
 
-        generateDao.insertVocabList(vocabList)
+        vocabList.forEach {
+            val existing = generateDao.getGenerateVocabularyByWord(it.word)
+            if (existing == null) {
+                generateDao.insertGenerateVocabulary(it)
+            }
+        }
     }
 
     suspend fun processVocabulary() {

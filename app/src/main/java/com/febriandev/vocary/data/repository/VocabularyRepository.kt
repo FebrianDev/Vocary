@@ -1,6 +1,5 @@
 package com.febriandev.vocary.data.repository
 
-import androidx.room.Query
 import com.febriandev.vocary.data.db.dao.VocabularyDao
 import com.febriandev.vocary.data.db.entity.SrsStatus
 import com.febriandev.vocary.data.db.entity.VocabularyEntity
@@ -11,12 +10,11 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class VocabularyRepository @Inject constructor(private val vocabularyDao: VocabularyDao) {
-    suspend fun getAllVocabulary(currentTime: Long): List<Vocabulary> {
-        return vocabularyDao.getAllVocabulary(currentTime).map { it.toVocabulary() }.shuffled()
-    }
 
     suspend fun getAllVocabulary(currentTime: Long, preferredId: String? = null): List<Vocabulary> {
-        return vocabularyDao.getAllVocabulary(currentTime, preferredId).map { it.toVocabulary() }
+        return if (preferredId != null) vocabularyDao.getAllVocabulary(currentTime, preferredId)
+            .map { it.toVocabulary() } else return vocabularyDao.getAllVocabulary(currentTime)
+            .map { it.toVocabulary() }.shuffled()
     }
 
     // suspend fun getFavorites(): List<VocabularyEntity> = vocabularyDao.getFavorites()

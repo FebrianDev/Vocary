@@ -336,7 +336,7 @@ fun sendOneSignalNotification(userId: String, id: String, title: String, message
         val request = Request.Builder()
             .url("https://onesignal.com/api/v1/notifications")
             .post(body)
-            .addHeader("Authorization", "Basic ${BuildConfig.API_ONE_SIGNAL}")
+            .addHeader("Authorization", "Basic ${BuildConfig.API_ONESIGNAL}")
             .build()
 
         client.newCall(request).execute().use { response ->

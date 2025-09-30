@@ -171,7 +171,7 @@ class MainActivity : BaseActivity() {
                 val coroutineScope = rememberCoroutineScope()
 
                 val vocabs by vocabViewModel.vocabs.collectAsState()
-                val loading by vocabViewModel.loading.collectAsState()
+                //val loading by vocabViewModel.loading.collectAsState()
 
                 var showLoadingDialog by remember { mutableStateOf(false) }
 
