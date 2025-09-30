@@ -3,6 +3,7 @@ package com.febriandev.vocary.worker
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -52,7 +53,16 @@ class SyncDataWorker @AssistedInject constructor(
             .setProgress(0, 0, true) // <-- indeterminate progress bar
             .build()
 
-        return ForegroundInfo(1, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                1,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+
+            ForegroundInfo(1, notification)
+        }
     }
 
     private fun showCompletedNotification(message: String) {

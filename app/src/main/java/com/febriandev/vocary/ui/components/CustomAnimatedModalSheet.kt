@@ -81,7 +81,7 @@ fun CustomAnimatedModalSheet(
                     //  fontFamily = FontFamily(Font(R.font.publicsans_medium))
                 )
                 Text(
-                    text = "v1.0.0",
+                    text = "v1.0.1",
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally),
                     //  fontFamily = FontFamily(Font(R.font.publicsans_regular)),
