@@ -90,7 +90,10 @@ class SubscriptionActivity : ComponentActivity() {
 
                 val isLoading by revenueCatViewModel.isLoading.collectAsState()
 
-                LaunchedEffect(premium) {
+                LaunchedEffect(premium, premiumExpirationDate) {
+
+                    Log.d("Premium",premiumExpirationDate.toString())
+
                     if (premium && user != null) {
 
                         val newUser = user.copy(

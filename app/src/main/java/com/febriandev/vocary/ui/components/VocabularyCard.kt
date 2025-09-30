@@ -2,9 +2,11 @@ package com.febriandev.vocary.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -189,20 +191,33 @@ fun VocabularyCard(
                     Card(
                         shape = RoundedCornerShape(16.dp),
                         elevation = CardDefaults.cardElevation(2.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.icon_image2),
-                                contentDescription = stringResource(R.string.app_name),
-                                modifier = Modifier
-                                    .size(36.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-                            )
+                            Card(
+                                shape = RoundedCornerShape(8.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                elevation = CardDefaults.cardElevation(2.dp),
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.icon_vocary),
+                                        contentDescription = stringResource(R.string.app_name),
+                                        modifier = Modifier
+                                            .size(16.dp),
+                                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                                    )
+                                }
+                            }
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "Vocary",

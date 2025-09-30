@@ -15,6 +15,7 @@ import com.febriandev.vocary.data.repository.UserRepository
 import com.febriandev.vocary.data.repository.VocabularyRepository
 import com.febriandev.vocary.utils.Constant.NOTIFICATION
 import com.febriandev.vocary.utils.Prefs
+import com.onesignal.OneSignal
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import okhttp3.MediaType.Companion.toMediaType
@@ -66,6 +67,9 @@ class NotificationWorker @AssistedInject constructor(
         val oneSignalAppId = "0140f446-57b5-4908-a124-5b6f55e0499e"
         val restApiKey =
             "os_v2_app_afapirsxwveqrijelnxvlycjtzhycsbxx3beyxufgml2fpjghldktyupims7q24etc3kfkxtx4nozfhhe5wd5dglbp7e7lgslz7tafi"
+
+        Log.d("OneSignal2", "Current externalId: ${userId}")
+
 
         // JSON payload menggunakan external user ID
         val jsonBody = JSONObject().apply {

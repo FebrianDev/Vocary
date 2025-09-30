@@ -15,6 +15,8 @@ import com.febriandev.vocary.worker.WorkFactory
 import com.onesignal.OneSignal
 import com.onesignal.notifications.INotificationClickEvent
 import com.onesignal.notifications.INotificationClickListener
+import com.onesignal.notifications.INotificationLifecycleListener
+import com.onesignal.notifications.INotificationWillDisplayEvent
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import dagger.hilt.android.HiltAndroidApp
@@ -41,8 +43,17 @@ class BaseApplication : Application(), Configuration.Provider {
 
         OneSignal.initWithContext(this, oneSignalAppId)
 
+        OneSignal.Notifications.addForegroundLifecycleListener(object :INotificationLifecycleListener{
+            override fun onWillDisplay(event: INotificationWillDisplayEvent) {
+                event.preventDefault()
+               // event.display()
+            }
+        })
+
         OneSignal.Notifications.addClickListener(object : INotificationClickListener {
+
             override fun onClick(event: INotificationClickEvent) {
+
                 val notification = event.notification
                 val additionalData = notification.additionalData
 

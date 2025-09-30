@@ -1,6 +1,8 @@
 package com.febriandev.vocary.ui.auth
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -45,6 +47,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import com.febriandev.vocary.BaseActivity
 import com.febriandev.vocary.R
 import com.febriandev.vocary.ui.components.EmailTextField
@@ -70,6 +73,16 @@ class AuthActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                1001
+            )
+        }
+
+
         setContent {
             VocaryTheme {
 
@@ -143,9 +156,9 @@ class AuthActivity : BaseActivity() {
                         // Spacer(modifier = Modifier.height(24.dp))
 
                         Image(
-                            painter = painterResource(R.drawable.icon_image2),
+                            painter = painterResource(R.drawable.icon_vocary),
                             contentDescription = "",
-                            modifier = Modifier.size(224.dp),
+                            modifier = Modifier.padding(vertical = 24.dp).size(108.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                         )
 

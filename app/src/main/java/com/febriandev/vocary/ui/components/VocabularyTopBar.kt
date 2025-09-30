@@ -73,7 +73,7 @@ fun VocabularyTopBar(
                         imageVector = Lucide.Crown,
                         contentDescription = "Crown",
                         tint = colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.padding(start = 8.dp).size(28.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                 }
