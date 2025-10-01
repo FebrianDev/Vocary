@@ -1,5 +1,6 @@
 package com.febriandev.vocary.ui.vm
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.febriandev.vocary.data.db.entity.SrsStatus
@@ -119,25 +120,31 @@ class VocabularyViewModel @Inject constructor(private val repository: Vocabulary
 
 
     fun toggleFavorite(id: String) = viewModelScope.launch {
-        val updatedList = _vocabs.value.map { vocab ->
-            if (vocab.id == id) {
-                val newFavorite = !vocab.isFavorite
+        Log.d("ToggleFavorite", "Checking ${id} vs $id")
+        try {
+            val updatedList = _vocabs.value.map { vocab ->
+                if (vocab.id == id) {
+                    val newFavorite = !vocab.isFavorite
 
-                // Simpan ke DB
-                if (newFavorite) {
-                    repository.addToFavorite(id)
-                    _uiMessage.send("\"${vocab.word}\" added to favorites")
-                } else {
-                    repository.removeFromFavorite(id)
-                    _uiMessage.send("\"${vocab.word}\" removed from favorites")
-                }
+                    // Simpan ke DB
+                    if (newFavorite) {
+                        repository.addToFavorite(id)
+                        _uiMessage.send("\"${vocab.word}\" added to favorites")
+                    } else {
+                        repository.removeFromFavorite(id)
+                        _uiMessage.send("\"${vocab.word}\" removed from favorites")
+                    }
 
-                // Update di UI state
-                vocab.copy(isFavorite = newFavorite)
-            } else vocab
-        }
+                    // Update di UI state
+                    vocab.copy(isFavorite = newFavorite)
+                } else vocab
+            }
 
-        _vocabs.value = updatedList
+            _vocabs.value = updatedList
+        }catch (e: Exception) {
+                Log.e("ToggleFavorite", "Error: ${e.message}", e)
+                _uiMessage.send("Failed to update favorite")
+            }
     }
 
     fun addToFavorite(id: String) = viewModelScope.launch {

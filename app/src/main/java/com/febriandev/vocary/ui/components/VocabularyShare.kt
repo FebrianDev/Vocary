@@ -38,14 +38,18 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.febriandev.vocary.domain.Vocabulary
+import com.febriandev.vocary.ui.favorite.FavoriteVocabViewModel
+import com.febriandev.vocary.ui.history.HistoryViewModel
+import com.febriandev.vocary.ui.vm.OwnWordViewModel
+import com.febriandev.vocary.ui.vm.VocabularyViewModel
 import com.febriandev.vocary.utils.copyText
 import com.febriandev.vocary.utils.imageBitmapWithBackground
 import com.febriandev.vocary.utils.saveImageToGallery
 import com.febriandev.vocary.utils.setAsWallpaper
 import com.febriandev.vocary.utils.shareImage
 import com.febriandev.vocary.utils.surfaceWithTonalElevation
-import com.febriandev.vocary.domain.Vocabulary
-import com.febriandev.vocary.ui.vm.VocabularyViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -56,6 +60,10 @@ fun VocabularyShare(
     activity: Activity,
     showSheet: Boolean,
     vocabularyViewModel: VocabularyViewModel,
+    favoriteVocabViewModel: FavoriteVocabViewModel = hiltViewModel(),
+    historyViewModel: HistoryViewModel = hiltViewModel(),
+    ownWordViewModel: OwnWordViewModel = hiltViewModel(),
+    type: String,
     onDismiss: () -> Unit
 ) {
     if (capturedImage != null) {
@@ -90,13 +98,22 @@ fun VocabularyShare(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                     verticalArrangement = Arrangement.Center,
-                    maxItemsInEachRow = 3 // jumlah item per baris
+                    maxItemsInEachRow = 3
                 ) {
                     ItemShare(Icons.Default.Download, "Save Image") {
                         saveImageToGallery(context, bitmapWithBg)
                     }
                     ItemShare(Icons.Default.Favorite, "Add to\nFavorite") {
-                        vocabularyViewModel.addToFavorite(vocabulary.id)
+                        when (type) {
+                            "favorite" -> favoriteVocabViewModel.addToFavorite(vocabulary.id)
+
+                            "history" -> historyViewModel.addToFavorite(vocabulary.id)
+
+                            "ownWord" -> ownWordViewModel.addToFavorite(vocabulary.id)
+
+                            "" -> vocabularyViewModel.addToFavorite(vocabulary.id)
+                        }
+
                     }
                     ItemShare(Icons.Default.Share, "Share") {
                         shareImage(activity, bitmapWithBg)
@@ -108,7 +125,16 @@ fun VocabularyShare(
                         setAsWallpaper(context, bitmapWithBg)
                     }
                     ItemShare(Icons.Default.Report, "Report") {
-                        vocabularyViewModel.addReport(vocabulary.id)
+                        when (type) {
+                            "favorite" -> favoriteVocabViewModel.addReport(vocabulary.id)
+
+                            "history" -> historyViewModel.addReport(vocabulary.id)
+
+                            "ownWord" -> ownWordViewModel.addReport(vocabulary.id)
+
+                            "" -> vocabularyViewModel.addReport(vocabulary.id)
+                        }
+
                         onDismiss.invoke()
                     }
                 }

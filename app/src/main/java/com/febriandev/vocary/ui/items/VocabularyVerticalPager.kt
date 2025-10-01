@@ -20,6 +20,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.febriandev.vocary.data.db.entity.SrsStatus
 import com.febriandev.vocary.domain.Vocabulary
 import com.febriandev.vocary.ui.components.VocabularyCard
+import com.febriandev.vocary.ui.favorite.FavoriteVocabViewModel
+import com.febriandev.vocary.ui.history.HistoryViewModel
+import com.febriandev.vocary.ui.vm.OwnWordViewModel
 import com.febriandev.vocary.ui.vm.VocabularyViewModel
 import com.febriandev.vocary.utils.ConnHelper
 import com.febriandev.vocary.utils.Constant.PRONOUNCE
@@ -50,7 +53,11 @@ fun VocabularyVerticalPager(
     active: Boolean = true,
     pagerState: PagerState = rememberPagerState(initialPage = 0),
     applicationContext: Context = LocalContext.current,
-    vocabViewModel: VocabularyViewModel = hiltViewModel()
+    vocabViewModel: VocabularyViewModel = hiltViewModel(),
+    type: String,
+    favoriteVocabViewModel: FavoriteVocabViewModel = hiltViewModel(),
+    historyViewModel: HistoryViewModel = hiltViewModel(),
+    ownWordViewModel: OwnWordViewModel = hiltViewModel()
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -59,11 +66,24 @@ fun VocabularyVerticalPager(
     var isPlaying by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        vocabViewModel.uiMessage.collect { message ->
-            applicationContext.showMessage(message)
+        when (type) {
+            "favorite" -> favoriteVocabViewModel.uiMessage.collect {
+                applicationContext.showMessage(it)
+            }
+
+            "history" -> historyViewModel.uiMessage.collect {
+                applicationContext.showMessage(it)
+            }
+
+            "ownWord" -> ownWordViewModel.uiMessage.collect {
+                applicationContext.showMessage(it)
+            }
+
+            "" -> vocabViewModel.uiMessage.collect { message ->
+                applicationContext.showMessage(message)
+            }
         }
     }
-
     VerticalPager(
         count = vocabs.size,
         modifier = Modifier
@@ -96,7 +116,8 @@ fun VocabularyVerticalPager(
                     try {
                         withContext(Dispatchers.IO) {
                             val fileName = "${vocabulary.word}.mp3"
-                            audioFile = downloadAndSaveAudio(applicationContext, audioUrl, fileName)
+                            audioFile =
+                                downloadAndSaveAudio(applicationContext, audioUrl, fileName)
                         }
                     } catch (e: Exception) {
                         Log.e("AudioDownload", "Failed: ${e.localizedMessage}")
@@ -179,9 +200,19 @@ fun VocabularyVerticalPager(
                 onInfoCLick.invoke(vocabulary)
             },
             onShareClick = { onShareClick.invoke(vocabulary) },
-            onNotes = { onNoteCLick.invoke(vocabulary) },
+            onNotes = {
+                Log.d("MyVocabulary", vocabulary.toString())
+                onNoteCLick.invoke(vocabulary)
+            },
             onFavoriteClick = {
-                vocabViewModel.toggleFavorite(vocabulary.id)
+                Log.d("MyVocabulary", vocabulary.toString())
+                when (type) {
+                    "favorite" -> favoriteVocabViewModel.toggleFavorite(vocabulary.id)
+                    "history" -> historyViewModel.toggleFavorite(vocabulary.id)
+                    "ownWord" -> ownWordViewModel.toggleFavorite(vocabulary.id)
+                    else -> vocabViewModel.toggleFavorite(vocabulary.id)
+                }
+
             }) {
             if (it == SrsStatus.KNOWN) onProgress.invoke(vocabulary.id)
             vocabViewModel.updateSrsStatus(vocabulary.id, it)

@@ -121,21 +121,22 @@ class ListHistoryActivity : ComponentActivity() {
                                 }
                             }
 
-                            VocabularyVerticalPager(
-                                vocabs = vocabs,
-                                shouldCaptureScreenshot = shouldCaptureScreenshot, onNoteCLick = {
-                                    showNote = true
-                                },
-                                onShareClick = {
-                                    shouldCaptureScreenshot = true
-                                },
-                                onProgress = {
-
-                                },
-                                pagerState = pagerState,
-                                applicationContext = applicationContext,
-                                vocabViewModel = vocabularyViewModel
-                            )
+//                            VocabularyVerticalPager(
+//                                vocabs = vocabs,
+//                                shouldCaptureScreenshot = shouldCaptureScreenshot, onNoteCLick = {
+//                                    showNote = true
+//                                },
+//                                onShareClick = {
+//                                    shouldCaptureScreenshot = true
+//                                },
+//                                onProgress = {
+//
+//                                },
+//                                pagerState = pagerState,
+//                                applicationContext = applicationContext,
+//                                vocabViewModel = vocabularyViewModel,
+//
+//                            )
                         }
 
                         //VocabularyNote(showNote) { showNote = false }

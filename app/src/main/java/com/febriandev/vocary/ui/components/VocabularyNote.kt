@@ -20,7 +20,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.febriandev.vocary.domain.Vocabulary
+import com.febriandev.vocary.ui.favorite.FavoriteVocabViewModel
+import com.febriandev.vocary.ui.history.HistoryViewModel
+import com.febriandev.vocary.ui.vm.OwnWordViewModel
 import com.febriandev.vocary.ui.vm.VocabularyViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,7 +32,11 @@ import com.febriandev.vocary.ui.vm.VocabularyViewModel
 fun VocabularyNote(
     vocabulary: Vocabulary,
     showSheet: Boolean,
+    type: String,
     vocabularyViewModel: VocabularyViewModel,
+    favoriteVocabViewModel: FavoriteVocabViewModel = hiltViewModel(),
+    historyViewModel: HistoryViewModel = hiltViewModel(),
+    ownWordViewModel: OwnWordViewModel = hiltViewModel(),
     onDismiss: () -> Unit
 ) {
     CustomAnimatedModalSheet2(
@@ -69,7 +77,13 @@ fun VocabularyNote(
 
                 Button(
                     onClick = {
-                        vocabularyViewModel.updateNote(vocabulary.id, noteText)
+                        when (type) {
+                            "favorite" -> favoriteVocabViewModel.updateNote(vocabulary.id, noteText)
+                            "history" -> historyViewModel.updateNote(vocabulary.id, noteText)
+                            "ownWord" -> ownWordViewModel.updateNote(vocabulary.id, noteText)
+                            "" -> vocabularyViewModel.updateNote(vocabulary.id, noteText)
+                        }
+
                         onDismiss()
                     },
                     modifier = Modifier

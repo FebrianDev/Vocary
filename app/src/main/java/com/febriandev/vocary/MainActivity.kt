@@ -287,7 +287,8 @@ class MainActivity : BaseActivity() {
                                 active = true,
                                 pagerState,
                                 applicationContext,
-                                vocabViewModel
+                                vocabViewModel,
+                                ""
                             )
 
                             if (!shouldCaptureScreenshot) {
@@ -431,7 +432,7 @@ class MainActivity : BaseActivity() {
                             showInfo = false
                         }
 
-                        VocabularyNote(selectedVocab, showNote, vocabViewModel) {
+                        VocabularyNote(selectedVocab, showNote, type = "", vocabViewModel) {
                             showNote = false
                         }
 
@@ -441,7 +442,8 @@ class MainActivity : BaseActivity() {
                             applicationContext,
                             this@MainActivity,
                             showShare,
-                            vocabViewModel
+                            vocabViewModel,
+                            type = ""
                         ) {
                             showShare = false
                             shouldCaptureScreenshot = false

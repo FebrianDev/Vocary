@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
@@ -158,7 +156,8 @@ class ListVocabularyActivity : ComponentActivity() {
 
                         Column(
                             modifier = Modifier
-                                .fillMaxSize().padding(24.dp),
+                                .fillMaxSize()
+                                .padding(24.dp),
                         ) {
 
                             // Top bar: Streak & Today
@@ -190,15 +189,22 @@ class ListVocabularyActivity : ComponentActivity() {
                                 active = false,
                                 pagerState,
                                 applicationContext,
-                                vocabularyViewModel
-                            )
+                                vocabularyViewModel,
+                                type = type ?: "",
+
+                                )
                         }
 
                         VocabularyInfo(showInfo, selectedVocab, applicationContext) {
                             showInfo = false
                         }
 
-                        VocabularyNote(selectedVocab, showNote, vocabularyViewModel) {
+                        VocabularyNote(
+                            selectedVocab,
+                            showNote,
+                            type = type ?: "",
+                            vocabularyViewModel
+                        ) {
                             showNote = false
                         }
 
@@ -208,7 +214,7 @@ class ListVocabularyActivity : ComponentActivity() {
                             applicationContext,
                             this@ListVocabularyActivity,
                             showShare,
-                            vocabularyViewModel
+                            vocabularyViewModel, type = type ?: ""
                         ) {
                             showShare = false
                             shouldCaptureScreenshot = false
