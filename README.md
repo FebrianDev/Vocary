@@ -20,7 +20,7 @@ In short: Vocary makes vocabulary learning personalized, efficient, and enjoyabl
 - **Frontend:** Jetpack Compose for a modern, responsive Android UI.  
 - **Backend & Services:** Firebase Firestore for cloud data storage and Firebase Auth for user authentication.  
 - **AI & NLP:** Azure AI for generating vocabulary sets and Azure Speech-to-Text for pronunciation practice.  
-- **Notifications:** OneSignal for push reminders and daily practice nudges.  
+- **Notifications:** OneSignal for background vocabulary reminders when the app is inactive, to nudge users to practice daily.  
 - **Offline storage:** Room Database for local caching, ensuring learning continues without internet.  
 - **Monetization:** RevenueCat for subscription management and premium access control.  
 - **Architecture:** Clean architecture with Repository pattern and reactive state management using coroutines & Flow.  
